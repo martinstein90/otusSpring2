@@ -43,6 +43,7 @@ public class LibraryJDBCdao implements LibraryDao {
         jdbc.update("insert authors (firstname, lastname) values (?, ?)", author.getFirstname(), author.getLastname());
     }
     private void insertBook(Book book) {
+        jdbc.update("insert books (title, author_id, genre_id) values (?, ?, ?)", book.getTitle(), book.getAuthor().getId(), book.getGenre().getId());
     }
 
     @Override
@@ -105,7 +106,7 @@ public class LibraryJDBCdao implements LibraryDao {
                 new Object[] {
                         booksAmountByOnePage * (page-1),
                         booksAmountByOnePage },
-                new BookMapper());
+                new BookMapper(this));
     }
 
     @Override
@@ -132,7 +133,7 @@ public class LibraryJDBCdao implements LibraryDao {
     private Book findBookById(int id) {
         return jdbc.queryForObject("select * from books where id = ?",
                 new Object[] {id},
-                new BookMapper());
+                new BookMapper(this));
     }
 
     @Override
@@ -179,7 +180,15 @@ public class LibraryJDBCdao implements LibraryDao {
             sql.append("title = ? ");
             args.add(book.getTitle());
         }
-        return jdbc.query(sql.toString(), args.toArray(), new BookMapper());
+        if(book.getAuthor() != null) {
+            sql.append("author_id = ? ");
+            args.add(book.getAuthor().getId());
+        }
+        if(book.getGenre() != null) {
+            sql.append("genre_id = ? ");
+            args.add(book.getGenre().getId());
+        }
+        return jdbc.query(sql.toString(), args.toArray(), new BookMapper(this));
     }
 
     @Override
@@ -205,8 +214,10 @@ public class LibraryJDBCdao implements LibraryDao {
                 idOldGenre);
     }
     private void updateBook(int idOldBook, Book newBook) {
-        jdbc.update("update books set title =?,  lastname =? where id=?",
+        jdbc.update("update books set title =?, author_id =?, genre_id =? where id=?",
                 newBook.getTitle(),
+                newBook.getAuthor(),
+                newBook.getGenre(),
                 idOldBook);
     }
 
@@ -259,12 +270,35 @@ public class LibraryJDBCdao implements LibraryDao {
 
     private static class BookMapper implements RowMapper<Book> {
 
+        private final LibraryJDBCdao dao;
+
+        public BookMapper(LibraryJDBCdao dao) {
+            this.dao = dao;
+        }
+
         @Override
         public Book mapRow(ResultSet resultSet, int i) throws SQLException {
             int id = resultSet.getInt("id");
             String name = resultSet.getString("name");
+            int author_id = resultSet.getInt("author_id");
+            int genre_id = resultSet.getInt("genre_id");
 
-            return null;
+            Author author;
+            if(authorCache.containsKey(author_id))
+                author = authorCache.get(author_id);
+            else
+                author = dao.findById(Author.class, author_id);
+
+            Genre genre;
+            if(genreCache.containsKey(genre_id))
+                genre = genreCache.get(genre_id);
+            else
+                genre = dao.findById(Genre.class, genre_id);
+
+            Book book = new Book(name, author, genre);
+            book.setId(id);
+
+            return book;
         }
     }
 }

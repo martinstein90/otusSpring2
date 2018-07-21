@@ -22,8 +22,6 @@ public class Main {
         LibraryDao dao = context.getBean(LibraryDao.class);
 
 
-        getAllGenres(dao);
-        finGenreById(dao);
 
         System.out.println("Author:");
         System.out.println(LibraryJDBCdao.authorCache);
@@ -58,8 +56,8 @@ public class Main {
 
 
 
-        deleteAuthor(dao);
-        deleteGenre(dao);
+//        deleteAuthor(dao);
+//        deleteGenre(dao);
     }
 
 
@@ -75,7 +73,7 @@ public class Main {
         }
         if(res == 1) {
             System.out.printf("%s обавлен в бд!\n", author);
-
+        }
     }
 
     public static void addGenre(LibraryDao dao) {
@@ -160,7 +158,6 @@ public class Main {
 
     public static void updateGenre(LibraryDao dao) {
         dao.update(7, new Genre("Ужасы!!!!"));
-
     }
 
     public static void deleteAuthor(LibraryDao dao) {
