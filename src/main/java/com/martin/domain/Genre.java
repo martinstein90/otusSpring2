@@ -1,12 +1,15 @@
 package com.martin.domain;
 
-public class Genre {
-    private final int id;
+public class Genre implements Storable {
+    private  int id;
     private final String title;
 
-    public Genre(int id, String title) {
-        this.id = id;
+    public Genre(String title) {
         this.title = title;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getId() {

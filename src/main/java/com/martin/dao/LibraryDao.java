@@ -2,18 +2,20 @@ package com.martin.dao;
 
 import com.martin.domain.Author;
 import com.martin.domain.Book;
+import com.martin.domain.Storable;
 
 import java.util.List;
 
 public interface LibraryDao {
-    void insertAuthor(Author author);
+    <T extends Storable> void insert(T object);
 
-    int getAuthorCount();
-    List<Author> getAllAuthors(int page, int amountAuthorsByOnePage);
-    Author findAuthorById(int authorId);
-    List<Author> findAuthorByNames(String firstname, String lastname);
+    <T extends Storable> int getCount(Class<T> cl);
+    <T extends Storable> List<T> getAll(Class<T> cl, int page, int amountAuthorsByOnePage);
 
-    void updateAuthor(int idOldAuthor, Author newAuthor);
+    <T extends Storable> T findById(Class<T> cl, int id);
+    <T extends Storable> List<T> find(T object)
 
-    void deleteAuthor(int idDeletedAuthor);
+    <T extends Storable> void update(int id, T object)
+
+    <T extends Storable> void delete(Class<T> cl, int id);
 }

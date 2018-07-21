@@ -21,7 +21,7 @@ public class Main {
 //        int res = 0;
 //        Author author = new Author("Константин", "Петров");
 //        try{
-//            dao.insertAuthor(author);
+//            dao.insert(author);
 //            res = 1;
 //        }
 //        catch(DataAccessException exception) {
@@ -34,7 +34,7 @@ public class Main {
 
 //        System.out.println("count: " + dao.getAuthorCount());
 
-
+        Class authorClass = Author.class;
 
 //        List<Author> authors = dao.getAllAuthors(1, 5);
 //        System.out.println("Page 1");

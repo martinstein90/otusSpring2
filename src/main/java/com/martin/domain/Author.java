@@ -2,7 +2,7 @@ package com.martin.domain;
 
 import java.util.Objects;
 
-public class Author {
+public class Author implements Storable {
     private int id;
     private final String firstname;
     private final String lastname;
