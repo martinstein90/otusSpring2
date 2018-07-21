@@ -21,4 +21,12 @@ public class Genre implements Storable {
     public String getTitle() {
         return title;
     }
+
+    @Override
+    public String toString() {
+        return "Genre{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                '}';
+    }
 }
