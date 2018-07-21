@@ -15,10 +15,15 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
+import static com.martin.helper.Ansi.*;
+
 
 @Aspect
 @Component
 public class Cache {
+
+    private final String WORKING_COLOR = ANSI_GREEN;
+    private final String RESET_COLOR = ANSI_RESET;
 
     @AfterReturning(pointcut = "execution(public java.util.List com.martin.dao.LibraryJDBCdao.getAll(Class, int, int))", returning = "res")
     public void addToCache(JoinPoint point, Object res) throws Throwable {
@@ -40,11 +45,11 @@ public class Cache {
         List<Storable> objects = (List<Storable>) res;
             for (Storable object : objects) {
                 if (!cache.containsKey(object.getId())) {
-                    System.out.printf("Объекта %s нет в кеше", object);
+                    System.out.printf(WORKING_COLOR + "Объекта %s нет в кеше" + RESET_COLOR, object);
                     cache.put(object.getId(), object);
-                    System.out.printf(" , добавлен в кеш\n", object);
+                    System.out.printf(WORKING_COLOR + " , добавлен в кеш\n" + RESET_COLOR, object);
                 } else
-                    System.out.printf("Объект %s есть в кеше\n", object);
+                    System.out.printf(WORKING_COLOR + "Объект %s есть в кеше\n" + RESET_COLOR, object);
             }
     }
 
@@ -77,14 +82,14 @@ public class Cache {
             return null;
 
         if(!cache.containsKey(id)){
-            System.out.printf("Объекта c id %d нет в кеше\n", id);
+            System.out.printf(WORKING_COLOR + "Объекта %s c id %d нет в кеше\n" + RESET_COLOR, cl.getSimpleName(), id);
             proceed = point.proceed();
             Storable object = (Storable)proceed;
             cache.put(object.getId(), object);
-            System.out.printf("Объект %s добавлен в кеш\n", object);
+            System.out.printf(WORKING_COLOR + "Объект %s добавлен в кеш\n" + RESET_COLOR, object);
         }
         else {
-            System.out.printf("Объект с id %d есть в кеше\n", id);
+            System.out.printf(WORKING_COLOR + "Объект %s с id %d есть в кеше\n" + RESET_COLOR, cl.getSimpleName(), id);
             proceed = cache.get(id);
         }
 

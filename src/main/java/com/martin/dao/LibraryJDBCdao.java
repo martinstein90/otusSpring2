@@ -131,7 +131,7 @@ public class LibraryJDBCdao implements LibraryDao {
                 new GenreMapper());
     }
     private Book findBookById(int id) {
-        return jdbc.queryForObject("select * from books where id = ?",
+        return jdbc.queryForObject("select * from books where id =?",
                 new Object[] {id},
                 new BookMapper(this));
     }
@@ -181,11 +181,11 @@ public class LibraryJDBCdao implements LibraryDao {
             args.add(book.getTitle());
         }
         if(book.getAuthor() != null) {
-            sql.append("author_id = ? ");
+            sql.append("and author_id = ? ");
             args.add(book.getAuthor().getId());
         }
         if(book.getGenre() != null) {
-            sql.append("genre_id = ? ");
+            sql.append("and genre_id = ? ");
             args.add(book.getGenre().getId());
         }
         return jdbc.query(sql.toString(), args.toArray(), new BookMapper(this));
@@ -216,8 +216,8 @@ public class LibraryJDBCdao implements LibraryDao {
     private void updateBook(int idOldBook, Book newBook) {
         jdbc.update("update books set title =?, author_id =?, genre_id =? where id=?",
                 newBook.getTitle(),
-                newBook.getAuthor(),
-                newBook.getGenre(),
+                newBook.getAuthor().getId(),
+                newBook.getGenre().getId(),
                 idOldBook);
     }
 
@@ -279,7 +279,7 @@ public class LibraryJDBCdao implements LibraryDao {
         @Override
         public Book mapRow(ResultSet resultSet, int i) throws SQLException {
             int id = resultSet.getInt("id");
-            String name = resultSet.getString("name");
+            String name = resultSet.getString("title");
             int author_id = resultSet.getInt("author_id");
             int genre_id = resultSet.getInt("genre_id");
 

@@ -33,4 +33,14 @@ public class Book implements Storable {
     public Genre getGenre() {
         return genre;
     }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", author=" + author +
+                ", genre=" + genre +
+                '}';
+    }
 }
