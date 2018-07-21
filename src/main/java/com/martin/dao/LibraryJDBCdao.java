@@ -15,7 +15,9 @@ import java.util.*;
 @Repository
 public class LibraryJDBCdao implements LibraryDao {
 
-    public static final Map<Integer, Author> cacheAuthor = new HashMap<>();
+    public static final Map<Integer, Author> authorCache = new HashMap<>();
+    public static final Map<Integer, Genre> genreCache = new HashMap<>();
+    public static final Map<Integer, Book> bookCache = new HashMap<>();
 
     private final JdbcOperations jdbc;
 
@@ -209,9 +211,9 @@ public class LibraryJDBCdao implements LibraryDao {
     }
 
     @Override
-    <T extends Storable> void delete(Class<T> cl, int id) {
+    public <T extends Storable> void delete(Class<T> cl, int id) {
         if(cl == Author.class)
-            deleteAuthor();
+            deleteAuthor(id);
         else if(cl == Genre.class)
             deleteGenre(id);
         else if(cl == Book.class)
@@ -229,7 +231,7 @@ public class LibraryJDBCdao implements LibraryDao {
         jdbc.update("delete from books where id = ?", idDeletedBook);
     }
 
-    
+
     private static class AuthorMapper implements RowMapper<Author> {
 
         @Override

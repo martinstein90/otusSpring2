@@ -44,10 +44,10 @@ public class Main {
 
 
 
-        List<Author> authors = dao.findAuthorByNames("Федор", null);
-        for (Author a:authors ) {
-            System.out.println(a);
-        }
+//        List<Author> authors = dao.findAuthorByNames("Федор", null);
+//        for (Author a:authors ) {
+//            System.out.println(a);
+//        }
 
 
 

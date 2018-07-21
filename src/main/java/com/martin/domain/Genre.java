@@ -8,10 +8,12 @@ public class Genre implements Storable {
         this.title = title;
     }
 
+    @Override
     public void setId(int id) {
         this.id = id;
     }
 
+    @Override
     public int getId() {
         return id;
     }

@@ -12,8 +12,14 @@ public class Book implements Storable {
         this.genre = genre;
     }
 
+    @Override
     public int getId() {
         return id;
+    }
+
+    @Override
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {
