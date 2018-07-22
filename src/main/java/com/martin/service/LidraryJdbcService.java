@@ -21,9 +21,9 @@ public class LidraryJdbcService implements LibraryService {
     private final String WORKING_COLOR = ANSI_RED;
     private final String RESET_COLOR = ANSI_RESET;
 
-    private final String ERROR_STRING = "Операция с объектов %s не выполнена";
+    private final String ERROR_STRING = "Операция с объектом %s не выполнена";
     private final String DUPLICATE_ERROR_STRING = "Запись %s существует";
-    private final String EMPTY_RESULT_BY_ID_ERROR_STRING = "Объект c id %d не найден";
+    private final String EMPTY_RESULT_BY_ID_ERROR_STRING = "Объект %s c id %d не найден";
 
     public LidraryJdbcService(LibraryDao dao) {
         this.dao = dao;
@@ -61,45 +61,77 @@ public class LidraryJdbcService implements LibraryService {
 
     @Override
     public void addBook(String title, int authorId, int genreId) throws Exception {
-        Author author = null;
+        Author author;
         try {
             author = dao.findById(Author.class, authorId);
         }
         catch (EmptyResultDataAccessException exception) {
-            throw new Exception(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, authorId));
+            throw new Exception(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Author.class.getSimpleName(), authorId));
         }
         catch(DataAccessException exception) {
             System.out.println(WORKING_COLOR + "Exception: " + exception.getClass().getSimpleName() + " Msg: " + exception.getMessage() + ANSI_RESET);
-            throw new Exception(String.format(ERROR_STRING, author));
+            throw new Exception(String.format(ERROR_STRING, Author.class.getSimpleName()));
         }
 
-        Genre genre = dao.findById(Genre.class, genreId);
+        Genre genre;
+        try {
+            genre = dao.findById(Genre.class, genreId);
+        }
+        catch (EmptyResultDataAccessException exception) {
+            throw new Exception(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Genre.class.getSimpleName(), genreId));
+        }
+        catch(DataAccessException exception) {
+            System.out.println(WORKING_COLOR + "Exception: " + exception.getClass().getSimpleName() + " Msg: " + exception.getMessage() + ANSI_RESET);
+            throw new Exception(String.format(ERROR_STRING, Genre.class.getSimpleName()));
+        }
 
         Book book = new Book(title, author, genre);
         try{
             dao.insert(book);
         }
         catch (DuplicateKeyException exception){
-            throw new Exception(String.format(DUPLICATE_ERROR_STRING, author));
+            throw new Exception(String.format(DUPLICATE_ERROR_STRING, book));
         }
         catch(DataAccessException exception) {
             System.out.println(WORKING_COLOR + "Exception: " + exception.getClass().getSimpleName() + " Msg: " + exception.getMessage() + ANSI_RESET);
-            throw new RuntimeException(ERROR_STRING);
+            throw new Exception(String.format(ERROR_STRING, book));
         }
     }
 
     @Override
     public void addBook(String title, String firsname, String lastname, int genreId) {
 
+
+        Genre genre;
+        try {
+            genre = dao.findById(Genre.class, genreId);
+        }
+        catch (EmptyResultDataAccessException exception) {
+            throw new Exception(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Genre.class.getSimpleName(), genreId));
+        }
+        catch(DataAccessException exception) {
+            System.out.println(WORKING_COLOR + "Exception: " + exception.getClass().getSimpleName() + " Msg: " + exception.getMessage() + ANSI_RESET);
+            throw new Exception(String.format(ERROR_STRING, Genre.class.getSimpleName()));
+        }
+
+        Book book = new Book(title, author, genre);
+        try{
+            dao.insert(book);
+        }
+        catch (DuplicateKeyException exception){
+            throw new Exception(String.format(DUPLICATE_ERROR_STRING, book));
+        }
+        catch(DataAccessException exception) {
+            System.out.println(WORKING_COLOR + "Exception: " + exception.getClass().getSimpleName() + " Msg: " + exception.getMessage() + ANSI_RESET);
+            throw new Exception(String.format(ERROR_STRING, book));
+        }
     }
 
     @Override
     public void addBook(String title, int authorId, String titleGenre) {
-
     }
 
     @Override
     public void addBook(String title, String firsname, String lastname, String titleGenre) {
-
     }
 }

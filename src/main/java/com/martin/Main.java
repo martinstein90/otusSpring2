@@ -25,9 +25,9 @@ public class Main {
 
 
         try {
-            service.addBook("111", 100, 2);
+            service.addBook("121", 2, 2);
         } catch (Exception e) {
-            System.out.println(e.getClass().getSimpleName());
+            System.out.println(e.getMessage());
         }
     }
 
