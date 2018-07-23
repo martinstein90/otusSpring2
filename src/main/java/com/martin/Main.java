@@ -32,6 +32,7 @@ public class Main {
 
         service.getAllAuthors();
         service.getAllGenres();
+        service.getAllBooks();
     }
 
 

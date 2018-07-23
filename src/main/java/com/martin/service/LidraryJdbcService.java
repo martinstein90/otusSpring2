@@ -131,57 +131,13 @@ public class LidraryJdbcService implements LibraryService {
         int page, pages = (int) Math.ceil((float)amount / amountByOnePage);
         for (page = 0; page < pages; page++) {
             List<Author> all = dao.getAll(Author.class, page + 1, amountByOnePage);
-            try {
-                System.out.println("Page " + (page +1));
-                show(Author.class, all);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+            System.out.println("Page " + (page +1));
+            for (Author a : all) {
+                System.out.println(a);
             }
         }
     }
 
-    private void show(Class cl, List<? extends Storable> all) throws IllegalAccessException {
-        System.out.println(cl);
-        Field[] fields = cl.getDeclaredFields();
-        int[] lenghts = new int[fields.length];
-        for (int i =0; i< fields.length; i++) {
-            if(lenghts[i] <  fields[i].getName().length())
-                lenghts[i] =  fields[i].getName().length();
-            fields[i].setAccessible(true);
-            for (int j = 0; j < all.size(); j++) {
-                int length = fields[i].get(all.get(j)).toString().length();
-                if(lenghts[i] <  length)
-                    lenghts[i] = length;
-            }
-        }
-
-        int maxLenght = 0;
-        for (int i =0; i<fields.length; i++) {
-            System.out.printf("|%" + lenghts[i] + "s ", fields[i].getName());
-            maxLenght += lenghts[i];
-        }
-        System.out.println("|");
-
-        char[] line = new char[maxLenght + 7] ;
-        Arrays.fill(line, 0, line.length, '-');
-        System.out.println(line);
-
-        if(cl == Author.class) {
-            for (Object o: all) {
-                System.out.printf("|%"+ lenghts[0] + "d |", ((Author)o).getId());
-                System.out.printf("%"+ lenghts[1] + "s |", ((Author)o).getFirstname());
-                System.out.printf("%"+ lenghts[2] + "s |\n", ((Author)o).getLastname());
-            }
-        }
-        else if(cl == Genre.class) {
-            for (Object o: all) {
-                System.out.printf("|%"+ lenghts[0] + "d |", ((Genre)o).getId());
-                System.out.printf("%"+ lenghts[1] + "s |\n", ((Genre)o).getTitle());
-            }
-        }
-
-        System.out.println(line);
-    }
 
 
     @Override
@@ -191,11 +147,9 @@ public class LidraryJdbcService implements LibraryService {
         int page, pages = (int) Math.ceil((float)amount / amountByOnePage);
         for (page = 0; page < pages; page++) {
             List<Genre> all = dao.getAll(Genre.class, page + 1, amountByOnePage);
-            try {
-                System.out.println("Page " + (page +1));
-                show(Genre.class, all);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+            System.out.println("Page " + (page +1));
+            for (Genre g : all) {
+                System.out.println(g);
             }
         }
     }
@@ -208,8 +162,9 @@ public class LidraryJdbcService implements LibraryService {
         for (page = 0; page < pages; page++) {
             List<Book> all = dao.getAll(Book.class, page + 1, amountByOnePage);
             System.out.println("Page " + (page + 1));
-            for (Book b : all)
+            for (Book b : all) {
                 System.out.println(b);
+            }
         }
     }
 

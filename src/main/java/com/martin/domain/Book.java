@@ -36,11 +36,6 @@ public class Book implements Storable {
 
     @Override
     public String toString() {
-        return "Book{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", author=" + author +
-                ", genre=" + genre +
-                '}';
+        return "Книга " + id + " " + title + " " + author + " " + genre ;
     }
 }

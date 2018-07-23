@@ -33,11 +33,7 @@ public class Author implements Storable {
 
     @Override
     public String toString() {
-        return "Author{" +
-                "id=" + id +
-                ", firstname='" + firstname + '\'' +
-                ", lastname='" + lastname + '\'' +
-                '}';
+        return  "Автор " + id + " " + firstname +  " " + lastname ;
     }
 
     @Override
