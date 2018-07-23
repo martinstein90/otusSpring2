@@ -30,6 +30,7 @@ public class Author implements Storable {
         return lastname;
     }
 
+
     @Override
     public String toString() {
         return "Author{" +

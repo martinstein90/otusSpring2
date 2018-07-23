@@ -49,7 +49,6 @@ public class LibraryJDBCdao implements LibraryDao {
 
         jdbc.update("insert genres (title) values (?)", genre.getTitle());
     }
-
     private void insertBook(Book book) {
         if(book.getTitle() == null )
             throw new IllegalArgumentException("Must be title != null by book");

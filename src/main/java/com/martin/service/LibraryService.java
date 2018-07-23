@@ -15,22 +15,22 @@ public interface LibraryService {
     void getAllGenres();
     void getAllBooks();
 
-    void findAuthor(String authorFirstname, String authotLastname);
-    void findGenre(String genreTitle);
-    void findBookByTitle(String bookTitle);
-    void findBooksByAuthor(int authorId);
-    void findBooksByGenre(int genreId);
+    void findAuthor (String authorFirstname, String authotLastname);
+    void findGenre  (String genreTitle);
+    void findBookByTitle    (String bookTitle);
+    void findBooksByAuthor  (int authorId);
+    void findBooksByGenre   (int genreId);
 
-    void findAuthorById(int authorId);
-    void findGenreById(int genreId);
-    void findBookById(int bookId);
+    void findAuthorById (int authorId);
+    void findGenreById  (int genreId);
+    void findBookById   (int bookId);
 
-    void updateAuthor(int oldAuthorId, String authorFirstname, String authotLastname);
-    void updateGenre(int oldGenreId, String genreTitle);
-    void updateBook(int oldBookId, String bookTitle);
-    void updateBook(int oldBookId, String bookTitle, int authorId, int genreId);
+    void updateAuthor   (int oldAuthorId, String authorFirstname, String authotLastname);
+    void updateGenre    (int oldGenreId, String genreTitle);
+    void updateBook     (int oldBookId, String bookTitle);
+    void updateBook     (int oldBookId, String bookTitle, int authorId, int genreId);
 
-    void deleteBook(int deletedBookId);
-    void deleteAuthor(int deleteAuthor);
-    void deleteGenre(int deletedGenreId);
+    void deleteBook     (int deletedBookId);
+    void deleteAuthor   (int deleteAuthor);
+    void deleteGenre    (int deletedGenreId);
 }

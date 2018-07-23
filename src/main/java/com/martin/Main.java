@@ -24,11 +24,14 @@ public class Main {
         LibraryService service = context.getBean(LibraryService.class);
 
 
-        try {
-            service.addBook("121", 2, 2);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+//        try {
+//            service.addGenre(null);
+//        } catch (Exception e) {
+//            System.out.println(e.getMessage());
+//        }
+
+        service.getAllAuthors();
+        service.getAllGenres();
     }
 
 
