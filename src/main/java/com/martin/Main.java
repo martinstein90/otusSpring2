@@ -30,9 +30,11 @@ public class Main {
 //            System.out.println(e.getMessage());
 //        }
 
-        service.getAllAuthors();
-        service.getAllGenres();
-        service.getAllBooks();
+        try {
+            service.deleteBook(1);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
 

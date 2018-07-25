@@ -27,29 +27,29 @@ public class LibraryJDBCdao implements LibraryDao {
     }
 
     @Override
-    public <T extends Storable> void insert(T object) {
+    public <T extends Storable> int insert(T object) {
         if(object instanceof Author)
-            insertAuthor((Author)object);
+            return insertAuthor((Author)object);
         else if(object instanceof Genre)
-            insertGenre((Genre)object);
+            return insertGenre((Genre)object);
         else if(object instanceof Book)
-            insertBook((Book)object);
+            return insertBook((Book)object);
         else
             throw new IllegalArgumentException("Must be object instanceof Author or Genre or Book");
     }
-    private void insertAuthor(Author author) {
+    private int insertAuthor(Author author) {
         if(author.getFirstname() == null || author.getLastname() == null)
             throw new IllegalArgumentException("Must be firstname != null and lastname != null by author");
 
-        jdbc.update("insert authors (firstname, lastname) values (?, ?)", author.getFirstname(), author.getLastname());
+        return jdbc.update("insert authors (firstname, lastname) values (?, ?)", author.getFirstname(), author.getLastname());
     }
-    private void insertGenre(Genre genre) {
+    private int insertGenre(Genre genre) {
         if(genre.getTitle() == null )
             throw new IllegalArgumentException("Must be title != null by genre");
 
-        jdbc.update("insert genres (title) values (?)", genre.getTitle());
+        return jdbc.update("insert genres (title) values (?)", genre.getTitle());
     }
-    private void insertBook(Book book) {
+    private int insertBook(Book book) {
         if(book.getTitle() == null )
             throw new IllegalArgumentException("Must be title != null by book");
 
@@ -85,7 +85,7 @@ public class LibraryJDBCdao implements LibraryDao {
         sql.append(fields);
         sql.append(values);
 
-        jdbc.update(sql.toString(), args.toArray(), types.toArray(new Integer[types.size()]));
+        return jdbc.update(sql.toString(), args.toArray(), types.toArray(new Integer[types.size()]));
     }
 
     @Override
@@ -251,63 +251,63 @@ public class LibraryJDBCdao implements LibraryDao {
     }
 
     @Override
-    public <T extends Storable> void update(int id, T object) {
+    public <T extends Storable> int update(int id, T object) {
         if(object instanceof Author)
-            updateAuthor(id, (Author)object);
+            return updateAuthor(id, (Author)object);
         else if(object instanceof Genre)
-            updateGenre(id, (Genre)object);
+            return updateGenre(id, (Genre)object);
         else if(object instanceof Book)
-            updateBook(id, (Book)object);
+            return updateBook(id, (Book)object);
         else
             throw new IllegalArgumentException("Must be object instanceof Author or Genre or Book");
     }
-    private void updateAuthor   (int oldAuthorId, Author newAuthor) {
+    private int updateAuthor   (int oldAuthorId, Author newAuthor) {
         if(newAuthor.getFirstname() == null || newAuthor.getLastname() == null)
             throw new IllegalArgumentException("Must be fistname != null and lastname != null by author");
 
-        jdbc.update("update authors set firstname = ?,  lastname = ? where id = ?",
-                newAuthor.getFirstname(),
-                newAuthor.getLastname(),
-                oldAuthorId);
+        return jdbc.update("update authors set firstname = ?,  lastname = ? where id = ?",
+                    newAuthor.getFirstname(),
+                    newAuthor.getLastname(),
+                    oldAuthorId);
     }
-    private void updateGenre    (int oldGenreId, Genre newGenre) {
+    private int updateGenre    (int oldGenreId, Genre newGenre) {
         if(newGenre.getTitle() == null)
             throw new IllegalArgumentException("Must be title != null by genre");
 
-        jdbc.update("update genres set title = ?, where id = ?",
-                newGenre.getTitle(),
-                oldGenreId);
+        return jdbc.update("update genres set title = ?, where id = ?",
+                    newGenre.getTitle(),
+                    oldGenreId);
     }
-    private void updateBook     (int oldBookId, Book newBook) {
+    private int updateBook     (int oldBookId, Book newBook) {
         if(newBook.getTitle() == null || newBook.getAuthor() == null || newBook.getGenre() == null)
             throw new IllegalArgumentException("Must be title != null and author != null and genre != null by book");
 
-        jdbc.update("update books set title = ?, author_id = ?, genre_id = ? where id = ?",
-                newBook.getTitle(),
-                newBook.getAuthor().getId(),
-                newBook.getGenre().getId(),
-                oldBookId);
+        return jdbc.update("update books set title = ?, author_id = ?, genre_id = ? where id = ?",
+                    newBook.getTitle(),
+                    newBook.getAuthor().getId(),
+                    newBook.getGenre().getId(),
+                    oldBookId);
     }
 
     @Override
-    public <T extends Storable> void delete(Class<T> cl, int id) {
+    public <T extends Storable> int delete(Class<T> cl, int id) {
         if(cl == Author.class)
-            deleteAuthor(id);
+            return deleteAuthor(id);
         else if(cl == Genre.class)
-            deleteGenre(id);
+            return deleteGenre(id);
         else if(cl == Book.class)
-            deleteBook(id);
+            return deleteBook(id);
         else
             throw new IllegalArgumentException("Must be cl is a Author.class or Genre.class or Book.class");
     }
-    private void deleteAuthor   (int deletedAuthorId) {
-        jdbc.update("delete from authors where id = ?", deletedAuthorId);
+    private int deleteAuthor   (int deletedAuthorId) {
+        return jdbc.update("delete from authors where id = ?", deletedAuthorId);
     }
-    private void deleteGenre    (int deletedGenreId) {
-        jdbc.update("delete from genres where id = ?", deletedGenreId);
+    private int deleteGenre    (int deletedGenreId) {
+        return jdbc.update("delete from genres where id = ?", deletedGenreId);
     }
-    private void deleteBook     (int deletedBookId) {
-        jdbc.update("delete from books where id = ?", deletedBookId);
+    private int deleteBook     (int deletedBookId) {
+        return jdbc.update("delete from books where id = ?", deletedBookId);
     }
 
 
