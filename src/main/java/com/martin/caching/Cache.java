@@ -53,7 +53,6 @@ public class Cache {
             }
     }
 
-    // как делать с T ?
     @Around("execution(public * com.martin.dao.LibraryJDBCdao.findById(Class, int))")
     public Object findInCacheById(ProceedingJoinPoint point) throws Throwable {
         if(point.getArgs().length != 2)

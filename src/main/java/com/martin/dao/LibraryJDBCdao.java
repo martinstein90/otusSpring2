@@ -38,8 +38,11 @@ public class LibraryJDBCdao implements LibraryDao {
             throw new IllegalArgumentException("Must be object instanceof Author or Genre or Book");
     }
     private int insertAuthor(Author author) {
-        if(author.getFirstname() == null || author.getLastname() == null)
+        if( author.getFirstname() == null ||  author.getLastname() == null )
             throw new IllegalArgumentException("Must be firstname != null and lastname != null by author");
+
+        if(author.getFirstname().length() > 32 || author.getLastname().length() > 32 )
+            throw new IllegalArgumentException("Must be firstname.length() > 32  and lastname.length() > 32  by author");
 
         return jdbc.update("insert authors (firstname, lastname) values (?, ?)", author.getFirstname(), author.getLastname());
     }
@@ -47,11 +50,18 @@ public class LibraryJDBCdao implements LibraryDao {
         if(genre.getTitle() == null )
             throw new IllegalArgumentException("Must be title != null by genre");
 
+        if(genre.getTitle().length() > 32 )
+            throw new IllegalArgumentException("Must be title.length() > 32 by genre");
+
         return jdbc.update("insert genres (title) values (?)", genre.getTitle());
     }
     private int insertBook(Book book) {
         if(book.getTitle() == null )
             throw new IllegalArgumentException("Must be title != null by book");
+
+        if(book.getTitle().length() > 32 )
+            throw new IllegalArgumentException("Must be title.length() > 32 by book");
+
 
         StringBuilder sql = new StringBuilder();
         List<Object> args = new ArrayList<>(10);
@@ -190,6 +200,9 @@ public class LibraryJDBCdao implements LibraryDao {
             throw new IllegalArgumentException("Must be object instanceof Author or Genre or Book");
     }
     private List<Author>    findAuthor  (Author author) {
+        if(author.getFirstname().length() > 32 || author.getLastname().length() > 32 )
+            throw new IllegalArgumentException("Must be firstname.length() > 32  and lastname.length() > 32  by author");
+
         List<Object> args = new ArrayList<>(10);
         StringBuilder sql = new StringBuilder();
         sql.append("select * from authors where ");
@@ -210,6 +223,9 @@ public class LibraryJDBCdao implements LibraryDao {
         return jdbc.query(sql.toString(), args.toArray(), new AuthorMapper());
     }
     private List<Genre>     findGenre   (Genre genre) {
+        if(genre.getTitle().length() > 32 )
+            throw new IllegalArgumentException("Must be title.length() > 32 by genre");
+
         List<Object> args = new ArrayList<>(2);
         StringBuilder sql = new StringBuilder();
         sql.append("select * from genres where ");
@@ -224,6 +240,9 @@ public class LibraryJDBCdao implements LibraryDao {
         return jdbc.query(sql.toString(), args.toArray(), new GenreMapper());
     }
     private List<Book>      findBook    (Book book) {
+        if(book.getTitle().length() > 32 )
+            throw new IllegalArgumentException("Must be title.length() > 32 by book");
+
         List<Object> args = new ArrayList<>(10);
         StringBuilder sql = new StringBuilder();
         sql.append("select * from books where ");
@@ -265,6 +284,9 @@ public class LibraryJDBCdao implements LibraryDao {
         if(newAuthor.getFirstname() == null || newAuthor.getLastname() == null)
             throw new IllegalArgumentException("Must be fistname != null and lastname != null by author");
 
+        if(newAuthor.getFirstname().length() > 32 || newAuthor.getLastname().length() > 32 )
+            throw new IllegalArgumentException("Must be firstname.length() > 32  and lastname.length() > 32  by author");
+
         return jdbc.update("update authors set firstname = ?,  lastname = ? where id = ?",
                     newAuthor.getFirstname(),
                     newAuthor.getLastname(),
@@ -274,6 +296,9 @@ public class LibraryJDBCdao implements LibraryDao {
         if(newGenre.getTitle() == null)
             throw new IllegalArgumentException("Must be title != null by genre");
 
+        if(newGenre.getTitle().length() > 32 )
+            throw new IllegalArgumentException("Must be title.length() > 32 by genre");
+
         return jdbc.update("update genres set title = ?, where id = ?",
                     newGenre.getTitle(),
                     oldGenreId);
@@ -281,6 +306,9 @@ public class LibraryJDBCdao implements LibraryDao {
     private int updateBook     (int oldBookId, Book newBook) {
         if(newBook.getTitle() == null || newBook.getAuthor() == null || newBook.getGenre() == null)
             throw new IllegalArgumentException("Must be title != null and author != null and genre != null by book");
+
+        if(newBook.getTitle().length() > 32 )
+            throw new IllegalArgumentException("Must be title.length() > 32 by book");
 
         return jdbc.update("update books set title = ?, author_id = ?, genre_id = ? where id = ?",
                     newBook.getTitle(),
@@ -309,7 +337,6 @@ public class LibraryJDBCdao implements LibraryDao {
     private int deleteBook     (int deletedBookId) {
         return jdbc.update("delete from books where id = ?", deletedBookId);
     }
-
 
     private static class AuthorMapper implements RowMapper<Author> {
 

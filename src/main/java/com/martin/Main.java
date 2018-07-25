@@ -24,17 +24,6 @@ public class Main {
         LibraryService service = context.getBean(LibraryService.class);
 
 
-//        try {
-//            service.addGenre(null);
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage());
-//        }
-
-        try {
-            service.deleteBook(1);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
     }
 
 
@@ -96,7 +85,6 @@ public class Main {
         }
     }
 
-
     public static void findAuthor(LibraryDao dao) {
         List<Author> authors = dao.find(new Author("Федор", null));
         for (Author a:authors ) {
@@ -145,7 +133,6 @@ public class Main {
         Book book = new Book("rrrrrrrrrrr", author, genre);
         dao.update(11, book);
     }
-
 
     public static void deleteAuthor(LibraryDao dao) {
         dao.delete(Author.class, 23);

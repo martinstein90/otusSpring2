@@ -2,8 +2,24 @@ group 'com.martin'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
 
 sourceCompatibility = 1.8
+
+buildscript {
+    ext {
+        springBootVersion = '2.0.3.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
 
 repositories {
     mavenCentral()
@@ -12,10 +28,10 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'org.springframework.boot:spring-boot-starter'
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
     compile 'org.aspectj:aspectjrt:1.8.13'
     compile 'org.aspectj:aspectjweaver:1.8.13'
     //compile 'org.springframework.shell:spring-shell-starter:2.0.1.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-jdbc:2.0.3.RELEASE'
     compile 'mysql:mysql-connector-java:8.0.11'
-
 }
