@@ -16,10 +16,6 @@ import java.util.*;
 @Repository
 public class LibraryJDBCdao implements LibraryDao {
 
-    public static final Map<Integer, Author> authorCache = new HashMap<>();
-    public static final Map<Integer, Genre> genreCache = new HashMap<>();
-    public static final Map<Integer, Book> bookCache = new HashMap<>();
-
     private final JdbcOperations jdbc;
 
     public LibraryJDBCdao(JdbcOperations jdbcOperations) {
@@ -38,20 +34,20 @@ public class LibraryJDBCdao implements LibraryDao {
             throw new IllegalArgumentException("Must be object instanceof Author or Genre or Book");
     }
     private int insertAuthor(Author author) {
-        if( author.getFirstname() == null ||  author.getLastname() == null )
+        if(author.getFirstname() == null || author.getLastname() == null)
             throw new IllegalArgumentException("Must be firstname != null and lastname != null by author");
 
         if(author.getFirstname().length() > 32 || author.getLastname().length() > 32 )
-            throw new IllegalArgumentException("Must be firstname.length() > 32  and lastname.length() > 32  by author");
+            throw new IllegalArgumentException("Must be firstname.length() < 32  and lastname.length() < 32  by author");
 
         return jdbc.update("insert authors (firstname, lastname) values (?, ?)", author.getFirstname(), author.getLastname());
     }
     private int insertGenre(Genre genre) {
-        if(genre.getTitle() == null )
+        if(genre.getTitle() == null)
             throw new IllegalArgumentException("Must be title != null by genre");
 
-        if(genre.getTitle().length() > 32 )
-            throw new IllegalArgumentException("Must be title.length() > 32 by genre");
+        if(genre.getTitle().length() > 32)
+            throw new IllegalArgumentException("Must be title.length() < 32 by genre");
 
         return jdbc.update("insert genres (title) values (?)", genre.getTitle());
     }
@@ -60,8 +56,7 @@ public class LibraryJDBCdao implements LibraryDao {
             throw new IllegalArgumentException("Must be title != null by book");
 
         if(book.getTitle().length() > 32 )
-            throw new IllegalArgumentException("Must be title.length() > 32 by book");
-
+            throw new IllegalArgumentException("Must be title.length() < 32 by book");
 
         StringBuilder sql = new StringBuilder();
         List<Object> args = new ArrayList<>(10);
@@ -76,17 +71,21 @@ public class LibraryJDBCdao implements LibraryDao {
         types.add(Types.NVARCHAR);
 
         if(book.getAuthor() != null) {
-            fields.append(", author_id ");
-            values.append(", ? ");
-            args.add(book.getAuthor().getId());
-            types.add(Types.INTEGER);
+            if(book.getAuthor().getId() != 0) {
+                fields.append(", author_id ");
+                values.append(", ? ");
+                args.add(book.getAuthor().getId());
+                types.add(Types.INTEGER);
+            }
         }
 
         if(book.getGenre() != null) {
-            fields.append(", genre_id ");
-            values.append(", ? ");
-            args.add(book.getGenre().getId());
-            types.add(Types.INTEGER);
+            if(book.getGenre().getId() != 0) {
+                fields.append(", genre_id ");
+                values.append(", ? ");
+                args.add(book.getGenre().getId());
+                types.add(Types.INTEGER);
+            }
         }
 
         fields.append(") ");
@@ -378,18 +377,8 @@ public class LibraryJDBCdao implements LibraryDao {
             int author_id = resultSet.getInt("author_id");
             int genre_id = resultSet.getInt("genre_id");
 
-            Author author;
-            if(authorCache.containsKey(author_id))
-                author = authorCache.get(author_id);
-            else
-                author = dao.findById(Author.class, author_id);
-
-            Genre genre;
-            if(genreCache.containsKey(genre_id))
-                genre = genreCache.get(genre_id);
-            else
-                genre = dao.findById(Genre.class, genre_id);
-
+            Author author = dao.findById(Author.class, author_id);
+            Genre genre = dao.findById(Genre.class, genre_id);
             Book book = new Book(name, author, genre);
             book.setId(id);
 

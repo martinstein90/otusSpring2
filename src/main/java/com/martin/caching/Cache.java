@@ -12,6 +12,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,10 @@ public class Cache {
     private final String WORKING_COLOR = ANSI_GREEN;
     private final String RESET_COLOR = ANSI_RESET;
 
+    public static final Map<Integer, Author> authorCache = new HashMap<>();
+    public static final Map<Integer, Genre> genreCache = new HashMap<>();
+    public static final Map<Integer, Book> bookCache = new HashMap<>();
+
     @AfterReturning(pointcut = "execution(public java.util.List com.martin.dao.LibraryJDBCdao.getAll(Class, int, int))", returning = "res")
     public void addToCache(JoinPoint point, Object res) throws Throwable {
         Class cl;
@@ -33,11 +38,11 @@ public class Cache {
         if((point.getArgs())[0] instanceof Class) {
             cl = (Class)(point.getArgs())[0];
             if(cl == Author.class)
-                cache =  LibraryJDBCdao.authorCache;
+                cache =  authorCache;
             else if(cl == Genre.class)
-                cache =  LibraryJDBCdao.genreCache;
+                cache =  genreCache;
             else if(cl == Book.class)
-                cache =  LibraryJDBCdao.bookCache;
+                cache =  bookCache;
         }
         else
             return;
@@ -65,11 +70,11 @@ public class Cache {
         if((point.getArgs())[0] instanceof Class) {
             cl = (Class)(point.getArgs())[0];
             if(cl == Author.class)
-                cache =  LibraryJDBCdao.authorCache;
+                cache =  authorCache;
             else if(cl == Genre.class)
-                cache =  LibraryJDBCdao.genreCache;
+                cache =  genreCache;
             else if(cl == Book.class)
-                cache =  LibraryJDBCdao.bookCache;
+                cache =  bookCache;
         }
         else
             return null;
