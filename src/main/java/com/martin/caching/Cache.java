@@ -26,9 +26,9 @@ public class Cache {
     private final String WORKING_COLOR = ANSI_GREEN;
     private final String RESET_COLOR = ANSI_RESET;
 
-    public static final Map<Integer, Author> authorCache = new HashMap<>();
-    public static final Map<Integer, Genre> genreCache = new HashMap<>();
-    public static final Map<Integer, Book> bookCache = new HashMap<>();
+    private static final Map<Integer, Author> authorCache = new HashMap<>();
+    private static final Map<Integer, Genre> genreCache = new HashMap<>();
+    private static final Map<Integer, Book> bookCache = new HashMap<>();
 
     @AfterReturning(pointcut = "execution(public java.util.List com.martin.dao.LibraryJDBCdao.getAll(Class, int, int))", returning = "res")
     public void addToCache(JoinPoint point, Object res) throws Throwable {
