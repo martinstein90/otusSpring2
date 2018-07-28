@@ -22,8 +22,28 @@ public class Main {
     public static void main(String[] args)  {
         ApplicationContext context = SpringApplication.run(Main.class);
         LibraryService service = context.getBean(LibraryService.class);
+        LibraryDao dao = context.getBean(LibraryDao.class);
+
+//        getCountAuthor(dao);
+//        getCountGenre(dao);
+//        getCountBook(dao);
+
+//        getAllAuthors(dao);
+//        getAllBooks(dao);
+//        getAllGenres(dao);
 
 
+//        findAuthor(dao);
+//        findGenre(dao);
+//        findBook(dao);
+
+//        finAuthorById(dao);
+//        finGenreById(dao);
+//        finBookById(dao);
+
+//        updateAuthor(dao);
+//         updateGenre(dao);
+//       updateBook(dao);
     }
 
 
@@ -86,7 +106,7 @@ public class Main {
     }
 
     public static void findAuthor(LibraryDao dao) {
-        List<Author> authors = dao.find(new Author("Федор", null));
+        List<Author> authors = dao.find(new Author(null, "Иванов"));
         for (Author a:authors ) {
             System.out.println(a);
         }
@@ -101,30 +121,31 @@ public class Main {
 
     public static void findBook(LibraryDao dao) {
         Author author = dao.findById(Author.class, 4);
-        List<Book> books = dao.find(new Book("Опасные связи", author, null));
+        Genre genre = dao.findById(Genre.class, 2);
+        List<Book> books = dao.find(new Book("Опасные связи", author, genre));
         for (Book a: books ) {
             System.out.println(a);
         }
     }
 
     public static void finAuthorById(LibraryDao dao) {
-        System.out.println("Author by id = 7: " + dao.findById(Author.class, 7));
+        System.out.println("Author by id = 1: " + dao.findById(Author.class, 1));
     }
 
     public static void finGenreById(LibraryDao dao) {
-        System.out.println("Genre by id = 10: " + dao.findById(Genre.class, 10));
+        System.out.println("Genre by id = 1: " + dao.findById(Genre.class, 1));
     }
 
     public static void finBookById(LibraryDao dao) {
-        System.out.println("Genre by id = 10: " + dao.findById(Book.class, 10));
+        System.out.println("Genre by id = 1: " + dao.findById(Book.class, 1));
     }
 
     public static void updateAuthor(LibraryDao dao) {
-        dao.update(23, new Author("Кон", "Пет!!!!!"));
+        dao.update(1, new Author("Кон", "Пет!!!!!"));
     }
 
     public static void updateGenre(LibraryDao dao) {
-        dao.update(7, new Genre("Ужасы!!!!"));
+        dao.update(2, new Genre("Ужасы00!!!!"));
     }
 
     public static void updateBook(LibraryDao dao) {

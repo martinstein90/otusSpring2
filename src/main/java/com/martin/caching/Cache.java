@@ -1,6 +1,5 @@
 package com.martin.caching;
 
-import com.martin.dao.LibraryJDBCdao;
 import com.martin.domain.Author;
 import com.martin.domain.Book;
 import com.martin.domain.Genre;
@@ -38,31 +37,32 @@ public class Cache {
         if((point.getArgs())[0] instanceof Class) {
             cl = (Class)(point.getArgs())[0];
             if(cl == Author.class)
-                cache =  authorCache;
+                cache = authorCache;
             else if(cl == Genre.class)
-                cache =  genreCache;
+                cache = genreCache;
             else if(cl == Book.class)
-                cache =  bookCache;
+                cache = bookCache;
         }
         else
-            return;
+            throw new IllegalArgumentException("Must be point.getArgs())[0] instanceof Class");
 
-        List<Storable> objects = (List<Storable>) res;
+        if(res instanceof List) { // Todo Как проверить содержимое листа
+            List<Storable> objects = (List<Storable>) res;
             for (Storable object : objects) {
                 if (!cache.containsKey(object.getId())) {
                     System.out.printf(WORKING_COLOR + "Объекта %s нет в кеше" + RESET_COLOR, object);
                     cache.put(object.getId(), object);
                     System.out.printf(WORKING_COLOR + " , добавлен в кеш\n" + RESET_COLOR, object);
-                } else
+                }
+                else
                     System.out.printf(WORKING_COLOR + "Объект %s есть в кеше\n" + RESET_COLOR, object);
             }
+        }
+        // Todo Что написать в else???
     }
 
     @Around("execution(public * com.martin.dao.LibraryJDBCdao.findById(Class, int))")
     public Object findInCacheById(ProceedingJoinPoint point) throws Throwable {
-        if(point.getArgs().length != 2)
-            return null;
-
         Object proceed;
         Class cl;
         Map cache = null;
@@ -70,20 +70,20 @@ public class Cache {
         if((point.getArgs())[0] instanceof Class) {
             cl = (Class)(point.getArgs())[0];
             if(cl == Author.class)
-                cache =  authorCache;
+                cache = authorCache;
             else if(cl == Genre.class)
-                cache =  genreCache;
+                cache = genreCache;
             else if(cl == Book.class)
-                cache =  bookCache;
+                cache = bookCache;
         }
         else
-            return null;
+            throw new IllegalArgumentException("Must be point.getArgs())[0] instanceof Class");
 
         int id;
         if((point.getArgs())[1] instanceof Integer)
             id = (int)(point.getArgs())[1];
         else
-            return null;
+            throw new IllegalArgumentException("Must be point.getArgs())[1] instanceof Integer");
 
         if(!cache.containsKey(id)){
             System.out.printf(WORKING_COLOR + "Объекта %s c id %d нет в кеше\n" + RESET_COLOR, cl.getSimpleName(), id);
@@ -96,11 +96,19 @@ public class Cache {
             System.out.printf(WORKING_COLOR + "Объект %s с id %d есть в кеше\n" + RESET_COLOR, cl.getSimpleName(), id);
             proceed = cache.get(id);
         }
-
         return proceed;
     }
 
-
+    public <T extends Storable> T getFromCach(Class<T> cl, int id) {
+        if(cl == Author.class)
+            return (T) authorCache.get(id);
+        else if(cl == Genre.class)
+            return (T) genreCache.get(id);
+        else if(cl == Book.class)
+            return (T) bookCache.get(id);
+        else
+            throw new IllegalAccessError("Must be cl is a Author or Genre or Book");
+    }
 
 }
 
