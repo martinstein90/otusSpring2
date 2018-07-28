@@ -427,6 +427,9 @@ public class LidraryJdbcServiceTest {
         authors.clear();
     }
 
+
+
+
     @Test
     public void checkInsertAuthor() throws Exception {
         String firsname = "Ivan";
@@ -458,6 +461,7 @@ public class LidraryJdbcServiceTest {
         service.addGenre(title);
         service.addGenre(title);
     }
+
     @Test
     public void checkInsertBookWithNewAuthorAndGenre() throws Exception {
         String firstname = "Darya";

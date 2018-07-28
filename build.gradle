@@ -31,7 +31,7 @@ dependencies {
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     compile 'org.aspectj:aspectjrt:1.8.13'
     compile 'org.aspectj:aspectjweaver:1.8.13'
-    //compile 'org.springframework.shell:spring-shell-starter:2.0.1.RELEASE'
+    compile 'org.springframework.shell:spring-shell-starter:2.0.1.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-jdbc:2.0.3.RELEASE'
     compile 'mysql:mysql-connector-java:8.0.11'
 }

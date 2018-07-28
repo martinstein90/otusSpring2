@@ -62,6 +62,8 @@ public class LidraryJdbcService implements LibraryService {
             throw new Exception(String.format(DUPLICATE_ERROR_STRING, book));
         }
         catch(DataAccessException exception) {
+
+            System.out.println(exception.getMessage());
             throw new Exception(String.format(ERROR_STRING, book));
         }
     }
@@ -82,6 +84,7 @@ public class LidraryJdbcService implements LibraryService {
             throw new Exception(String.format(DUPLICATE_ERROR_STRING, book));
         }
         catch(DataAccessException exception) {
+            System.out.println(exception.getMessage());
             throw new Exception(String.format(ERROR_STRING, book));
         }
     }
