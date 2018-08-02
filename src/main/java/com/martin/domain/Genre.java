@@ -1,21 +1,19 @@
 package com.martin.domain;
 
-public class Genre implements Storable {
+import javax.persistence.*;
+
+@Entity
+@Table(name = "genres")
+public class Genre  {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  int id;
-    private final String title;
+
+    private String title;
 
     public Genre(String title) {
         this.title = title;
-    }
-
-    @Override
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    @Override
-    public int getId() {
-        return id;
     }
 
     public String getTitle() {

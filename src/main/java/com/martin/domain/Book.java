@@ -1,25 +1,28 @@
 package com.martin.domain;
 
-public class Book implements Storable {
+import javax.persistence.*;
+
+@Entity
+@Table(name = "books")
+public class Book {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private final String title;
-    private final Author author;
-    private final Genre genre;
+
+    private String title;
+
+    @OneToOne
+    private Author author;
+
+    @OneToOne
+    private Genre genre;
+
 
     public Book(String title, Author author, Genre genre) {
         this.title = title;
         this.author = author;
         this.genre = genre;
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getTitle() {

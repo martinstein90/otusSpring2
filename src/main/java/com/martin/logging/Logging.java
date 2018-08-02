@@ -14,7 +14,7 @@ public class Logging {
     private final String WORKING_COLOR = ANSI_BLUE;
     private final String RESET_COLOR = ANSI_RESET;
 
-    @Before("execution(* com.martin.dao.LibraryJDBCdao.*(..))")
+    @Before("execution(* com.martin.repository.AuthorRepository.*(..))")
     public void logBefore(JoinPoint point) {
         System.out.printf(WORKING_COLOR + "============== Вызов метода %s==============\n" + ANSI_RESET, point.getSignature().getName());
     }

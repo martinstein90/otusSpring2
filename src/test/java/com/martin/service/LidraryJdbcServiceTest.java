@@ -4,10 +4,8 @@ import com.martin.dao.LibraryDao;
 import com.martin.domain.Author;
 import com.martin.domain.Book;
 import com.martin.domain.Genre;
-import com.martin.domain.Storable;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.omg.CORBA.BooleanHolder;
@@ -41,7 +39,7 @@ public class LidraryJdbcServiceTest {
     private static int bookCount;
 
     @Autowired
-    LidraryJdbcService service;
+    LibraryJpaService service;
 
     @Before
     public void setUp() {

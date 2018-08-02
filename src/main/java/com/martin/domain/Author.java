@@ -1,25 +1,26 @@
 package com.martin.domain;
 
+import javax.persistence.*;
 import java.util.Objects;
 
-public class Author implements Storable {
+@Entity
+@Table(name = "authors")
+public class Author  {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private final String firstname;
-    private final String lastname;
+
+    private String firstname;
+
+    private String lastname;
+
+    public Author() {
+    }
 
     public Author(String firstname, String lastname) {
         this.firstname = firstname;
         this.lastname = lastname;
-    }
-
-    @Override
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    @Override
-    public int getId() {
-        return id;
     }
 
     public String getFirstname() {
@@ -30,24 +31,9 @@ public class Author implements Storable {
         return lastname;
     }
 
-
     @Override
     public String toString() {
         return  "Автор (" + id + ") " + firstname +  " " + lastname ;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Author author = (Author) o;
-        return id == author.id &&
-                Objects.equals(firstname, author.firstname) &&
-                Objects.equals(lastname, author.lastname);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, firstname, lastname);
-    }
 }
