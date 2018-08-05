@@ -29,3 +29,10 @@ insert into books(title, author_id, genre_id) values('Опасные связи'
 insert into books(title, author_id, genre_id) values('Идиот', 					6, 2);
 insert into books(title, author_id, genre_id) values('Сказка о рыбаке и рыбке',	8, 4);
 commit;
+
+insert into comments(comment, book_id) values('Супер', 1);
+insert into comments(comment, book_id) values('Отстой', 2);
+insert into comments(comment, book_id) values('Автор,что курил', 3);
+insert into comments(comment, book_id) values('Панки хой, Горшок жив!', 3);
+insert into comments(comment, book_id) values('Вот тебе и правда', 5);
+commit;

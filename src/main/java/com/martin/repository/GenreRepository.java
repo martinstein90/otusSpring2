@@ -1,20 +1,23 @@
 package com.martin.repository;
 
+import com.martin.domain.Book;
 import com.martin.domain.Genre;
 
 import java.util.List;
 
 public interface GenreRepository {
 
-    int insert(Genre genre);
+    void insert(Genre genre);
 
-    int getCount();
+    long getCount();
     List<Genre> getAll(int page, int amountByOnePage);
 
-    Genre findById(int id);
+    Genre findById(long id);
     List<Genre> find(Genre genre);
 
-    int update(int id, Genre genre);
+    List<Book> getBooks(long id);
 
-    void delete(int id);
+    int update(long id, Genre genre);
+
+    void delete(long id);
 }

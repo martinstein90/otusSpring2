@@ -1,7 +1,7 @@
 package com.martin.domain;
 
 import javax.persistence.*;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Table(name = "authors")
@@ -9,11 +9,14 @@ public class Author  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     private String firstname;
 
     private String lastname;
+
+    @OneToMany(mappedBy="author", fetch=FetchType.LAZY)
+    private List<Book> books = new ArrayList<>();
 
     public Author() {
     }
@@ -29,6 +32,10 @@ public class Author  {
 
     public String getLastname() {
         return lastname;
+    }
+
+    public List<Book> getBooks() {
+        return books;
     }
 
     @Override
