@@ -4,6 +4,7 @@ import com.martin.domain.Author;
 import com.martin.domain.Book;
 import com.martin.repository.AuthorRepository;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -24,17 +25,19 @@ public class AuthorJpaService implements AuthorService{
     }
 
     @Override
-    public void add(String firsname, String lastname) throws Exception {
+    public Author add(String firsname, String lastname) throws Exception {
         Author author = new Author(firsname, lastname);
         try {
-            authorRepository.insert(author);
+            author = authorRepository.insert(author);
         }
-        catch (DuplicateKeyException exception){
-            throw new Exception(String.format(DUPLICATE_ERROR_STRING, author));
+        catch (DataIntegrityViolationException exception) {
+            String causeMsg= exception.getCause().getCause().getMessage();
+            if(causeMsg.contains("Нарушение уникального индекса или первичного ключ"))
+                throw new Exception(String.format(DUPLICATE_ERROR_STRING, author));
+            else
+                throw new Exception(String.format(ERROR_STRING, author));
         }
-        catch(DataAccessException exception) {
-            throw new Exception(String.format(ERROR_STRING, author));
-        }
+        return author;
     }
 
     @Override
@@ -53,10 +56,7 @@ public class AuthorJpaService implements AuthorService{
         try {
             author = authorRepository.findById(id);
         }
-        catch (EmptyResultDataAccessException exception) {
-            throw new Exception(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Author.class.getSimpleName(), id));
-        }
-        catch(DataAccessException exception) {
+        catch (DataIntegrityViolationException exception) {
             throw new Exception(String.format(ERROR_STRING, Author.class.getSimpleName()));
         }
         return author;
@@ -69,7 +69,7 @@ public class AuthorJpaService implements AuthorService{
         try {
             authors = authorRepository.find(author);
         }
-        catch(DataAccessException exception) {
+        catch (DataIntegrityViolationException exception) {
             throw new Exception(String.format(ERROR_STRING, Author.class.getSimpleName()));
         }
         return authors;
@@ -81,15 +81,16 @@ public class AuthorJpaService implements AuthorService{
     }
 
     @Override
-    public void update(long id, String firstname, String lastname) throws Exception {
+    public Author update(long id, String firstname, String lastname) throws Exception {
         Author author = new Author(firstname, lastname);
         try {
-            authorRepository.update(id, author);
+            author = authorRepository.update(id, author);
         }
-        catch(DataAccessException exception) {
+        catch (DataIntegrityViolationException exception) {
             System.out.println(exception.getMessage());
             throw new Exception(String.format(ERROR_STRING, Author.class.getSimpleName()));
         }
+        return author;
    }
 
     @Override
@@ -97,7 +98,7 @@ public class AuthorJpaService implements AuthorService{
         try {
             authorRepository.delete(id);
         }
-        catch(DataAccessException exception) {
+        catch (DataIntegrityViolationException exception) {
             System.out.println(exception.getMessage());
             throw new Exception(String.format(ERROR_STRING, Author.class.getSimpleName()));
         }

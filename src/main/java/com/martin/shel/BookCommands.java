@@ -67,7 +67,7 @@ public class BookCommands {
     @ShellMethod("delete book")
     public void deleteBookById(@ShellOption int id) {
         try {
-            service.deleteBook(id);
+            service.delete(id);
             System.out.println(WORKING_COLOR + "Книга удалена" + RESET_COLOR);
         } catch (Exception e) {
             System.out.println(WORKING_COLOR + e.getMessage() + RESET_COLOR);

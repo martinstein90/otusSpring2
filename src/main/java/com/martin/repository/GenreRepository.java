@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface GenreRepository {
 
-    void insert(Genre genre);
+    Genre insert(Genre genre);
 
     long getCount();
     List<Genre> getAll(int page, int amountByOnePage);
@@ -17,7 +17,7 @@ public interface GenreRepository {
 
     List<Book> getBooks(long id);
 
-    int update(long id, Genre genre);
+    Genre update(long id, Genre genre);
 
     void delete(long id);
 }

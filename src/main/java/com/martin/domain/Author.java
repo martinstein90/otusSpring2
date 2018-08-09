@@ -5,7 +5,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "authors")
-public class Author  {
+public class Author  implements Storable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,13 +16,25 @@ public class Author  {
     private String lastname;
 
     @OneToMany(mappedBy="author", fetch=FetchType.LAZY)
-    private List<Book> books = new ArrayList<>();
+    private List<Book> books;
 
     public Author() {
     }
 
     public Author(String firstname, String lastname) {
         this.firstname = firstname;
+        this.lastname = lastname;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public void setLastname(String lastname) {
         this.lastname = lastname;
     }
 
@@ -43,4 +55,17 @@ public class Author  {
         return  "Автор (" + id + ") " + firstname +  " " + lastname ;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Author author = (Author) o;
+        return Objects.equals(firstname, author.firstname) &&
+                Objects.equals(lastname, author.lastname);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstname, lastname);
+    }
 }

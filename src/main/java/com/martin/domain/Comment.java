@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "comments")
-public class Comment {
+public class Comment implements Storable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,16 +24,25 @@ public class Comment {
         this.book = book;
     }
 
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     public String getComment() {
         return comment;
     }
 
-    @Override
-    public String toString() {
-        return "Комментарий (" + id + ") " + comment + " " + book;
-    }
-
     public Book getBook() {
         return book;
+    }
+
+    @Override
+    public String toString() {
+        return "Комментарий (" + id + ") " + comment;
+    }
+
+    @Override
+    public long getId() {
+        return 0;
     }
 }

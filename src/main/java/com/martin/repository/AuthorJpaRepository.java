@@ -1,5 +1,7 @@
 package com.martin.repository;
 
+import com.martin.caching.CachableFindById;
+import com.martin.caching.CachableGetAll;
 import com.martin.domain.Author;
 import com.martin.domain.Book;
 import org.springframework.stereotype.Repository;
@@ -9,11 +11,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-@SuppressWarnings("JpaQlInspection") //Todo чьл то это фигня, без которой не написать jpql?
+import static com.martin.repository.CheckHelper.*;
+
+
+@SuppressWarnings("JpaQlInspection") //Todo что это фигня, без которой не написать jpql?
 @Repository
 public class AuthorJpaRepository implements AuthorRepository {
 
@@ -22,17 +26,11 @@ public class AuthorJpaRepository implements AuthorRepository {
 
     @Transactional
     @Override
-    public void insert(Author author) {
+    public Author insert(Author author) {
         checkInsert(author);
 
         em.persist(author);
-    }
-    private void checkInsert(Author author) {
-        if(author.getFirstname() == null || author.getLastname() == null)
-            throw new IllegalArgumentException("Must be firstname != null and lastname != null by author");
-
-        if(author.getFirstname().length() > 32 || author.getLastname().length() > 32 )
-            throw new IllegalArgumentException("Must be firstname.length() < 32  and lastname.length() < 32  by author");
+        return author;
     }
 
     @Override
@@ -41,6 +39,7 @@ public class AuthorJpaRepository implements AuthorRepository {
         return (Long)query.getSingleResult();
     }
 
+    @CachableGetAll
     @Override
     public List<Author> getAll(int page, int amountByOnePage) {
         checkGetAll(page, amountByOnePage);
@@ -50,20 +49,13 @@ public class AuthorJpaRepository implements AuthorRepository {
         query.setMaxResults(amountByOnePage);
         return query.getResultList();
     }
-    private void checkGetAll(int page, int amountByOnePage) {
-        if(amountByOnePage <= 0 || page <=0)
-            throw new IllegalArgumentException("Must be amountByOnePage > 0 and page > 0");
-    }
 
+    @CachableFindById
     @Override
     public Author findById(long id) {
         checkFindById(id);
 
         return em.find(Author.class, id);
-    }
-    private void checkFindById(long id) {
-        if(id <= 0)
-            throw new IllegalArgumentException("Must be id > 0");
     }
 
     @Override
@@ -91,55 +83,26 @@ public class AuthorJpaRepository implements AuthorRepository {
         //Такие штуки не нужно реализовывать, или нужно но как-то по-другому. Сделал тест на sql иньекцию
         return jpql.toString();
     }
-    private void checkFind(Author author) {
-        if(author.getFirstname() == null && author.getLastname() == null)
-            throw new IllegalArgumentException("Must be firstname != null or lastname != null by author");
 
-        if(author.getFirstname() != null) {
-            if (author.getFirstname().length() > 32)
-                throw new IllegalArgumentException("Must be firstname.length() < 32  by author");
-        }
-        if(author.getLastname() != null) {
-            if (author.getLastname().length() > 32)
-                throw new IllegalArgumentException("Must be  lastname.length() < 32  by author");
-        }
-    }
-
+    @Transactional
     @Override
     public List<Book> getBooks(long id) {
-        System.out.println("getBooks");
-        Author author = em.find(Author.class, id);
-        System.out.println(author);
-        System.out.println("==========================");
-        System.out.println(author.getBooks());
-        System.out.println("==========================");
-        return null;
+        return new ArrayList<>(em.find(Author.class, id).getBooks());
     }
 
     @Override
     @Transactional
-    public int update(long id, Author author) {
+    public Author update(long id, Author author) {
         checkUpdate(author);
         checkUpdate(id);
 
-        Query query =  em.createQuery("update Author a set a.firstname = :firstname, a.lastname = :lastname where a.id = :id");
-        query.setParameter("firstname", author.getFirstname());
-        query.setParameter("lastname", author.getLastname());
-        query.setParameter("id", id);
-
-        return query.executeUpdate();
-    }
-    private void checkUpdate(Author author) {
-        if(author.getFirstname() == null || author.getLastname() == null)
-            throw new IllegalArgumentException("Must be fistname != null and lastname != null by author");
-
-        if(author.getFirstname().length() > 32 || author.getLastname().length() > 32 )
-            throw new IllegalArgumentException("Must be firstname.length() < 32  and lastname.length() < 32  by author");
-
-    }
-    private void checkUpdate(long id) {
-        if(id <= 0)
-            throw new IllegalArgumentException("Must be id > 0");
+        Author byId = findById(id);
+        if(author.getFirstname()!= null)
+            byId.setFirstname(author.getFirstname());
+        if(author.getLastname() != null)
+            byId.setLastname(author.getLastname());
+        em.merge(byId);
+        return byId;
     }
 
     @Transactional
@@ -149,10 +112,7 @@ public class AuthorJpaRepository implements AuthorRepository {
 
         Query query = em.createQuery("delete from Author a where a.id = :id");
         query.setParameter("id", id);
-        query.executeUpdate(); //Todo пока не зная как удалить автора с книгами
+        query.executeUpdate();
     }
-    private void checkDelete(long id) {
-        if(id <= 0)
-            throw new IllegalArgumentException("Must be id > 0");
-    }
+
 }

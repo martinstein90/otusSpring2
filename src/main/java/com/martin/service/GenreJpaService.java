@@ -4,6 +4,7 @@ import com.martin.domain.Book;
 import com.martin.domain.Genre;
 import com.martin.repository.GenreRepository;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -24,17 +25,19 @@ public class GenreJpaService implements GenreService{
     }
 
     @Override
-    public void add(String title) throws Exception {
+    public Genre add(String title) throws Exception {
         Genre genre = new Genre(title);
         try{
-            genreRepository.insert(genre);
+            genre = genreRepository.insert(genre);
         }
-        catch (DuplicateKeyException exception){
-            throw new Exception(String.format(DUPLICATE_ERROR_STRING, genre));
+        catch (DataIntegrityViolationException exception) {
+            String causeMsg= exception.getCause().getCause().getMessage();
+            if(causeMsg.contains("Нарушение уникального индекса или первичного ключ"))
+                throw new Exception(String.format(DUPLICATE_ERROR_STRING, genre));
+            else
+                throw new Exception(String.format(ERROR_STRING, genre));
         }
-        catch(DataAccessException exception) {
-            throw new Exception(String.format(ERROR_STRING, genre));
-        }
+        return genre;
     }
 
     @Override
@@ -53,10 +56,7 @@ public class GenreJpaService implements GenreService{
         try {
             genre = genreRepository.findById(id);
         }
-        catch (EmptyResultDataAccessException exception) {
-            throw new Exception(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Genre.class.getSimpleName(), id));
-        }
-        catch(DataAccessException exception) {
+        catch (DataIntegrityViolationException exception) {
             throw new Exception(String.format(ERROR_STRING, Genre.class.getSimpleName()));
         }
         return genre;
@@ -69,7 +69,7 @@ public class GenreJpaService implements GenreService{
         try {
             genres = genreRepository.find(genre);
         }
-        catch(DataAccessException exception) {
+        catch (DataIntegrityViolationException exception) {
             throw new Exception(String.format(ERROR_STRING, Genre.class.getSimpleName()));
         }
         return genres;
@@ -81,18 +81,15 @@ public class GenreJpaService implements GenreService{
     }
 
     @Override
-    public void update(long id, String title) throws Exception {
+    public Genre update(long id, String title) throws Exception {
         Genre genre = new Genre(title);
-        int amountUpdated;
         try {
-            amountUpdated = genreRepository.update(id, genre);
+            genre = genreRepository.update(id, genre);
         }
-        catch(DataAccessException exception) {
+        catch (DataIntegrityViolationException exception) {
             throw new Exception(String.format(ERROR_STRING, Genre.class.getSimpleName()));
         }
-
-        if(amountUpdated == 0)
-            throw new Exception(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Genre.class.getSimpleName(), id));
+        return genre;
     }
 
     @Override
@@ -100,7 +97,7 @@ public class GenreJpaService implements GenreService{
         try {
             genreRepository.delete(id);
         }
-        catch(DataAccessException exception) {
+        catch (DataIntegrityViolationException exception) {
             throw new Exception(String.format(ERROR_STRING, Genre.class.getSimpleName()));
         }
     }

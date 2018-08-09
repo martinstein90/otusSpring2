@@ -2,11 +2,10 @@ package com.martin.service;
 
 import com.martin.domain.Author;
 import com.martin.domain.Book;
+import com.martin.domain.Comment;
 import com.martin.domain.Genre;
 import com.martin.repository.BookRepository;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,47 +18,47 @@ public class BookJpaService implements BookService {
     private final String EMPTY_RESULT_BY_ID_ERROR_STRING = "Объект %s c id %d не найден";
 
     private final BookRepository bookRepository;
+    private final AuthorService authorService;
+    private final GenreService genreService;
 
-    public BookJpaService(BookRepository bookRepository) {
+
+    public BookJpaService(BookRepository bookRepository,
+                          AuthorService authorService,
+                          GenreService genreService) {
         this.bookRepository = bookRepository;
+        this.authorService = authorService;
+        this.genreService = genreService;
     }
 
     @Override
-    public void addBook(String title, int authorId, int genreId) throws Exception {
-//        Book book = new Book(title, findAuthorById(authorId), findGenreById(genreId));
-//        try{
-//            bookRepository.insert(book);
-//        }
-//        catch (DuplicateKeyException exception){
-//            throw new Exception(String.format(DUPLICATE_ERROR_STRING, book));
-//        }
-//        catch(DataAccessException exception) {
-//            System.out.println(exception.getMessage());
-//            throw new Exception(String.format(ERROR_STRING, book));
-//        }
+    public Book add(String title, int authorId, int genreId) throws Exception {
+        Book book = new Book(title, authorService.findById(authorId), genreService.findById(genreId));
+        book = add(book);
+        return book;
     }
 
     @Override
-    public void addBook(String authorTitle, String authorFirsname, String authorLastname, String genreTitle) throws Exception {
-        //addAuthor(authorFirsname, authorLastname);
-        Author foundAuthor = null;//(findAuthor(authorFirsname, authorLastname)).get(0);
+    public Book add(String authorTitle, String authorFirsname, String authorLastname, String genreTitle) throws Exception {
+        Author addedAuthor = authorService.add(authorFirsname, authorLastname);
+        Genre addedGenre = genreService.add((genreTitle));
+        Book book = new Book(authorTitle, addedAuthor, addedGenre);
+        book = add(book);
+        return book;
+    }
 
-        //addGenre(genreTitle);
-        Genre foundGenre = null;//(findGenre(genreTitle)).get(0);
-
-        Book book = new Book(authorTitle, foundAuthor, foundGenre);
+    private Book add(Book book) throws Exception {
         try{
-            bookRepository.insert(book);
+            book = bookRepository.insert(book);
         }
-        catch (DuplicateKeyException exception){
-            throw new Exception(String.format(DUPLICATE_ERROR_STRING, book));
+        catch (DataIntegrityViolationException exception) {
+            String causeMsg= exception.getCause().getCause().getMessage();
+            if(causeMsg.contains("Нарушение уникального индекса или первичного ключ"))
+                throw new Exception(String.format(DUPLICATE_ERROR_STRING, book));
+            else
+                throw new Exception(String.format(ERROR_STRING, book));
         }
-        catch(DataAccessException exception) {
-            System.out.println(exception.getMessage());
-            throw new Exception(String.format(ERROR_STRING, book));
-        }
+        return book;
     }
-
 
     @Override
     public long getCount() {
@@ -78,7 +77,7 @@ public class BookJpaService implements BookService {
         try {
             books = bookRepository.find(book);
         }
-        catch(DataAccessException exception) {
+        catch (DataIntegrityViolationException exception) {
             throw new Exception(String.format(ERROR_STRING, Book.class.getSimpleName()));
         }
         return books;
@@ -90,48 +89,49 @@ public class BookJpaService implements BookService {
         try {
             book = bookRepository.findById(id);
         }
-        catch (EmptyResultDataAccessException exception) {
-            throw new Exception(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Book.class.getSimpleName(), id));
-        }
-        catch(DataAccessException exception) {
+        catch (DataIntegrityViolationException exception) {
             throw new Exception(String.format(ERROR_STRING, Book.class.getSimpleName()));
         }
         return book;
     }
 
     @Override
-    public void updateBook(long bookId, String title) throws Exception {
-        Book currentBook =null;// findBookById(bookId);
+    public List<Comment> getComments(long id) {
+        return bookRepository.getComments(id);
+    }
+
+    @Override
+    public Book update(long bookId, String title) throws Exception {
+        Book currentBook = findById(bookId);
         Book newBook = new Book(title, currentBook.getAuthor(), currentBook.getGenre());
         try{
             bookRepository.update(bookId, newBook);
         }
-        catch(DataAccessException exception) {
+        catch (DataIntegrityViolationException exception) {
             throw new Exception(String.format(ERROR_STRING, Book.class.getSimpleName()));
         }
+        return null;
     }
 
     @Override
-    public void updateBook(long id, String bookTitle, int authorId, int genreId) throws Exception {
+    public Book update(long id, String bookTitle, int authorId, int genreId) throws Exception {
         Book newBook = null;//new Book(bookTitle, findAuthorById(authorId), findById(genreId));
         int amountUpdated;
         try{
-            amountUpdated = bookRepository.update(id, newBook);
+            newBook = bookRepository.update(id, newBook);
         }
-        catch(DataAccessException exception) {
+        catch (DataIntegrityViolationException exception) {
             throw new Exception(String.format(ERROR_STRING, Book.class.getSimpleName()));
         }
-
-        if(amountUpdated == 0)
-            throw new Exception(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Book.class.getSimpleName(), genreId));
+        return newBook;
     }
 
     @Override
-    public void deleteBook(long id) throws Exception {
+    public void delete(long id) throws Exception {
         try {
             bookRepository.delete(id);
         }
-        catch(DataAccessException exception) {
+        catch (DataIntegrityViolationException exception) {
             throw new Exception(String.format(ERROR_STRING, Author.class.getSimpleName()));
         }
     }

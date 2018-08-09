@@ -1,6 +1,7 @@
 package com.martin.repository;
 
-import com.martin.domain.Author;
+import com.martin.caching.CachableFindById;
+import com.martin.caching.CachableGetAll;
 import com.martin.domain.Book;
 import com.martin.domain.Genre;
 import org.springframework.stereotype.Repository;
@@ -10,7 +11,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.martin.repository.CheckHelper.*;
 
 @SuppressWarnings("JpaQlInspection")
 @Repository
@@ -23,25 +27,20 @@ public class GenreJpaRepository implements GenreRepository {
 
     @Transactional
     @Override
-    public void insert(Genre genre) {
+    public Genre insert(Genre genre) {
         checkInsert(genre);
 
         em.persist(genre);
-    }
-    private void checkInsert(Genre genre) {
-        if(genre.getTitle() == null)
-            throw new IllegalArgumentException("Must be title != null by genre");
-
-        if(genre.getTitle().length() > 32)
-            throw new IllegalArgumentException("Must be title.length() < 32 by genre");
+        return genre;
     }
 
     @Override
     public long getCount() {
         Query query = em.createQuery("select count(g) from Genre g");
-        return (Long)query.getSingleResult();
+        return (Long) query.getSingleResult();
     }
 
+    @CachableGetAll
     @Override
     public List<Genre> getAll(int page, int amountByOnePage) {
         checkGetAll(page, amountByOnePage);
@@ -51,20 +50,13 @@ public class GenreJpaRepository implements GenreRepository {
         query.setMaxResults(amountByOnePage);
         return query.getResultList();
     }
-    private void checkGetAll(int page, int amountByOnePage) {
-        if(amountByOnePage <= 0 || page <=0)
-            throw new IllegalArgumentException("Must be amountByOnePage > 0 and page > 0");
-    }
 
+    @CachableFindById
     @Override
     public Genre findById(long id) {
         checkFindById(id);
 
         return em.find(Genre.class, id);
-    }
-    private void checkFindById(long id) {
-        if(id <= 0)
-            throw new IllegalArgumentException("Must be id > 0");
     }
 
     @Override
@@ -75,46 +67,25 @@ public class GenreJpaRepository implements GenreRepository {
         query.setParameter("title", genre.getTitle());
         return query.getResultList();
     }
-    void checkFind(Genre genre) {
-        if(genre.getTitle() == null)
-            throw new IllegalArgumentException("Must be title != null by genre");
 
-        if(genre.getTitle().length() > 32 )
-            throw new IllegalArgumentException("Must be title.length() < 32 by genre");
-    }
-
+    @Transactional
     @Override
     public List<Book> getBooks(long id) {
-        Genre genre = em.find(Genre.class, id);
-        System.out.println(genre);
-        return genre.getBooks();
+        return new ArrayList<>(em.find(Genre.class, id).getBooks());
     }
 
     @Transactional
     @Override
-    public int update(long id, Genre genre) {
+    public Genre update(long id, Genre genre) {
         checkUpdate(genre);
         checkUpdate(id);
 
-        Query query =  em.createQuery("update Genre g set g.title = :title where g.id = :id");
-        query.setParameter("title", genre.getTitle());
-        query.setParameter("id", id);
-
-        return query.executeUpdate();
+        Genre byId = findById(id);
+        if (genre.getTitle() != null)
+            byId.setTitle(genre.getTitle());
+        em.merge(byId);
+        return byId;
     }
-    private void checkUpdate(Genre genre) {
-        if(genre.getTitle() == null)
-            throw new IllegalArgumentException("Must be title != null by genre");
-
-        if(genre.getTitle().length() > 32 )
-            throw new IllegalArgumentException("Must be title.length() < 32 by genre");
-
-    }
-    private void checkUpdate(long id) {
-        if(id <= 0)
-            throw new IllegalArgumentException("Must be id > 0");
-    }
-
 
     @Transactional
     @Override
@@ -124,9 +95,5 @@ public class GenreJpaRepository implements GenreRepository {
         Query query = em.createQuery("delete from Genre g where g.id = :id");
         query.setParameter("id", id);
         query.executeUpdate();
-    }
-    private void checkDelete(long id) {
-        if(id <= 0)
-            throw new IllegalArgumentException("Must be id > 0");
     }
 }
