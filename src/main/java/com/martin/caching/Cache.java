@@ -58,13 +58,13 @@ public class Cache {
         }
     }
 
-
+    //Todo Получается для каждой CRUD писать свою аннотацию CachableFindGetAll,  CachableFindById...
+    // Может такое получится что поставим аннотация CachableGetAll, а на update забудем и будем их кеша брать не обновленные данные.
+    // Как проверить? Рефлексией анализировать все классы пакета репозиторий?
+    //В данном примере кеш не подключен.
 
     @Around("@annotation(com.martin.caching.CachableFindById)")
-    public Object findInCacheById(ProceedingJoinPoint point) throws Throwable {  //Todo ПОлучается для каждой CRUD писать свою аннотацию CachableFindGetAll,  CachableFindById,///
-                                                                                // Может такое получится что поставим аннотация CachableGetAll
-                                //а на update забудем и будем их кеша брать не обновленные данные. Как проверить? Рефлексией анализировать все классы пакета репозиторий?
-        Object proceed;
+    public Object findInCacheById(ProceedingJoinPoint point) throws Throwable {  Object proceed;
         Map cache = null;
         Class<?> cl = point.getTarget().getClass();
         System.out.println(cl);
