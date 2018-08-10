@@ -1,7 +1,5 @@
 package com.martin.repository;
 
-import com.martin.caching.CachableFindById;
-import com.martin.caching.CachableGetAll;
 import com.martin.domain.Author;
 import com.martin.domain.Book;
 import org.springframework.stereotype.Repository;
@@ -26,11 +24,10 @@ public class AuthorJpaRepository implements AuthorRepository {
 
     @Transactional
     @Override
-    public Author insert(Author author) {
+    public void insert(Author author) {
         checkInsert(author);
 
         em.persist(author);
-        return author;
     }
 
     @Override
@@ -39,7 +36,6 @@ public class AuthorJpaRepository implements AuthorRepository {
         return (Long)query.getSingleResult();
     }
 
-    @CachableGetAll
     @Override
     public List<Author> getAll(int page, int amountByOnePage) {
         checkGetAll(page, amountByOnePage);
@@ -50,7 +46,6 @@ public class AuthorJpaRepository implements AuthorRepository {
         return query.getResultList();
     }
 
-    @CachableFindById
     @Override
     public Author findById(long id) {
         checkFindById(id);
@@ -92,7 +87,7 @@ public class AuthorJpaRepository implements AuthorRepository {
 
     @Override
     @Transactional
-    public Author update(long id, Author author) {
+    public void update(long id, Author author) {
         checkUpdate(author);
         checkUpdate(id);
 
@@ -102,7 +97,6 @@ public class AuthorJpaRepository implements AuthorRepository {
         if(author.getLastname() != null)
             byId.setLastname(author.getLastname());
         em.merge(byId);
-        return byId;
     }
 
     @Transactional

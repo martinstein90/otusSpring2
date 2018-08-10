@@ -25,11 +25,10 @@ public class BookJpaRepository implements  BookRepository{
 
     @Transactional
     @Override
-    public Book insert(Book book) {
+    public void insert(Book book) {
         checkInsert(book);
 
         em.persist(book);
-        return book;
     }
 
     @Override
@@ -71,8 +70,9 @@ public class BookJpaRepository implements  BookRepository{
         return new ArrayList<>(em.find(Book.class, id).getComments());
     }
 
+    @Transactional
     @Override
-    public Book update(long id, Book book) {
+    public void update(long id, Book book) {
         checkUpdate(book);
         checkUpdate(id);
 
@@ -85,9 +85,9 @@ public class BookJpaRepository implements  BookRepository{
         if(book.getGenre() != null)
             if(book.getGenre().getId() != 0)
                 byId.setGenre(book.getGenre());
-        return book;
     }
 
+    @Transactional
     @Override
     public void delete(long id) {
         Query query = em.createQuery("delete from Book b where b.id = :id");

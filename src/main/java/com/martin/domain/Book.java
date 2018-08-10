@@ -22,7 +22,7 @@ public class Book implements Storable{
     @JoinColumn(name="genre_id")
     private Genre genre;
 
-    @OneToMany(mappedBy="comment", fetch=FetchType.LAZY)
+    @OneToMany(mappedBy="book", fetch=FetchType.LAZY)
     private List<Comment> comments;
 
     public Book() {

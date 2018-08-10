@@ -3,10 +3,7 @@ package com.martin.service;
 import com.martin.domain.Author;
 import com.martin.domain.Book;
 import com.martin.repository.AuthorRepository;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,11 +25,10 @@ public class AuthorJpaService implements AuthorService{
     public Author add(String firsname, String lastname) throws Exception {
         Author author = new Author(firsname, lastname);
         try {
-            author = authorRepository.insert(author);
+            authorRepository.insert(author);
         }
-        catch (DataIntegrityViolationException exception) {
-            String causeMsg= exception.getCause().getCause().getMessage();
-            if(causeMsg.contains("Нарушение уникального индекса или первичного ключ"))
+        catch(DataIntegrityViolationException exception) {
+            if(exception.getCause().getCause().getMessage().contains("Нарушение уникального индекса или первичного ключ"))
                 throw new Exception(String.format(DUPLICATE_ERROR_STRING, author));
             else
                 throw new Exception(String.format(ERROR_STRING, author));
@@ -84,7 +80,7 @@ public class AuthorJpaService implements AuthorService{
     public Author update(long id, String firstname, String lastname) throws Exception {
         Author author = new Author(firstname, lastname);
         try {
-            author = authorRepository.update(id, author);
+            authorRepository.update(id, author);
         }
         catch (DataIntegrityViolationException exception) {
             System.out.println(exception.getMessage());

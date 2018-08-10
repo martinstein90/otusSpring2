@@ -1,10 +1,7 @@
 package com.martin.caching;
 
 import com.martin.domain.*;
-import com.martin.repository.AuthorRepository;
-import com.martin.repository.BookRepository;
-import com.martin.repository.CommentRepository;
-import com.martin.repository.GenreRepository;
+import com.martin.repository.*;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -28,23 +25,23 @@ public class Cache {
     private final String WORKING_COLOR = ANSI_GREEN;
     private final String RESET_COLOR = ANSI_RESET;
 
-    private static final Map<Integer, Author> authorCache = new HashMap<>();
-    private static final Map<Integer, Genre> genreCache = new HashMap<>();
-    private static final Map<Integer, Book> bookCache = new HashMap<>();
-    private static final Map<Integer, Comment> commentCache = new HashMap<>();
+    private static final Map<Long, Author> authorCache = new HashMap<>();
+    private static final Map<Long, Genre> genreCache = new HashMap<>();
+    private static final Map<Long, Book> bookCache = new HashMap<>();
+    private static final Map<Long, Comment> commentCache = new HashMap<>();
 
 
     @AfterReturning(pointcut = "@annotation(com.martin.caching.CachableGetAll)", returning = "res")
     public void addToCache(JoinPoint point, Object res) {
         Map cache = null;
         Class<?> cl = point.getTarget().getClass();
-        if(cl == AuthorRepository.class)
+        if(cl.equals( AuthorJpaRepository.class))
             cache = authorCache;
-        else if(cl == GenreRepository.class)
+        else if(cl.equals(GenreJpaRepository.class))
             cache = genreCache;
-        else if(cl == BookRepository.class)
+        else if(cl.equals(BookJpaRepository.class))
             cache = bookCache;
-        else if(cl == CommentRepository.class)
+        else if(cl.equals(CommentJpaRepository.class))
             cache = commentCache;
 
         if(res instanceof List) {  //Todo Как проверить содержимое листа????
@@ -70,20 +67,22 @@ public class Cache {
         Object proceed;
         Map cache = null;
         Class<?> cl = point.getTarget().getClass();
-            if(cl == AuthorRepository.class)
-                cache = authorCache;
-            else if(cl == GenreRepository.class)
-                cache = genreCache;
-            else if(cl == BookRepository.class)
-                cache = bookCache;
-            else if(cl == CommentRepository.class)
-                cache = commentCache;
+        System.out.println(cl);
 
-        int id;
-        if((point.getArgs())[0] instanceof Integer)
-            id = (int)(point.getArgs())[0];
+        if(cl.equals(AuthorJpaRepository.class))
+            cache = authorCache;
+        else if(cl.equals(GenreJpaRepository.class))
+            cache = genreCache;
+        else if(cl.equals(BookJpaRepository.class))
+            cache = bookCache;
+        else if(cl.equals(CommentJpaRepository.class))
+            cache = commentCache;
+
+        long id;
+        if((point.getArgs())[0] instanceof Long)
+            id = (long)(point.getArgs())[0];
         else
-            throw new IllegalArgumentException("Must be point.getArgs())[1] instanceof Integer");
+            throw new IllegalArgumentException("Must be point.getArgs())[0] instanceof Integer");
 
         if(!cache.containsKey(id)){
             showMessage(format("Объекта %s c id %d нет в кеше\n", cl.getSimpleName(), id));

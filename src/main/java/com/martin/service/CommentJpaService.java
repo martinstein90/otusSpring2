@@ -29,8 +29,7 @@ public class CommentJpaService implements CommentService{
             commentRepository.insert(com);
         }
         catch (DataIntegrityViolationException exception) {
-            String causeMsg= exception.getCause().getCause().getMessage();
-            if(causeMsg.contains("Нарушение уникального индекса или первичного ключ"))
+            if(exception.getCause().getCause().getMessage().contains("Нарушение уникального индекса или первичного ключ"))
                 throw new Exception(String.format(DUPLICATE_ERROR_STRING, com));
             else
                 throw new Exception(String.format(ERROR_STRING, com));
@@ -64,7 +63,7 @@ public class CommentJpaService implements CommentService{
     public Comment update(long id, String comment, int bookId) throws Exception {
         Comment com = new Comment(comment, bookService.findById(bookId));
         try {
-            com = commentRepository.update(id, com);
+            commentRepository.update(id, com);
         }
         catch (DataIntegrityViolationException exception) {
             System.out.println(exception.getMessage());

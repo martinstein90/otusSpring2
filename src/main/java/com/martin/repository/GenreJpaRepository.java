@@ -1,7 +1,5 @@
 package com.martin.repository;
 
-import com.martin.caching.CachableFindById;
-import com.martin.caching.CachableGetAll;
 import com.martin.domain.Book;
 import com.martin.domain.Genre;
 import org.springframework.stereotype.Repository;
@@ -27,11 +25,10 @@ public class GenreJpaRepository implements GenreRepository {
 
     @Transactional
     @Override
-    public Genre insert(Genre genre) {
+    public void insert(Genre genre) {
         checkInsert(genre);
 
         em.persist(genre);
-        return genre;
     }
 
     @Override
@@ -40,7 +37,6 @@ public class GenreJpaRepository implements GenreRepository {
         return (Long) query.getSingleResult();
     }
 
-    @CachableGetAll
     @Override
     public List<Genre> getAll(int page, int amountByOnePage) {
         checkGetAll(page, amountByOnePage);
@@ -51,7 +47,6 @@ public class GenreJpaRepository implements GenreRepository {
         return query.getResultList();
     }
 
-    @CachableFindById
     @Override
     public Genre findById(long id) {
         checkFindById(id);
@@ -76,15 +71,14 @@ public class GenreJpaRepository implements GenreRepository {
 
     @Transactional
     @Override
-    public Genre update(long id, Genre genre) {
+    public void update(long id, Genre genre) {
         checkUpdate(genre);
         checkUpdate(id);
 
         Genre byId = findById(id);
-        if (genre.getTitle() != null)
+        if(genre.getTitle() != null)
             byId.setTitle(genre.getTitle());
-        em.merge(byId);
-        return byId;
+       em.merge(byId);
     }
 
     @Transactional

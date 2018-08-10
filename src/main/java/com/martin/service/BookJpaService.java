@@ -48,7 +48,7 @@ public class BookJpaService implements BookService {
 
     private Book add(Book book) throws Exception {
         try{
-            book = bookRepository.insert(book);
+            bookRepository.insert(book);
         }
         catch (DataIntegrityViolationException exception) {
             String causeMsg= exception.getCause().getCause().getMessage();
@@ -118,7 +118,7 @@ public class BookJpaService implements BookService {
         Book newBook = null;//new Book(bookTitle, findAuthorById(authorId), findById(genreId));
         int amountUpdated;
         try{
-            newBook = bookRepository.update(id, newBook);
+            bookRepository.update(id, newBook);
         }
         catch (DataIntegrityViolationException exception) {
             throw new Exception(String.format(ERROR_STRING, Book.class.getSimpleName()));

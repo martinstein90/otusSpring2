@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface BookRepository {
 
-    Book insert(Book book);
+    void insert(Book book);
 
     long getCount();
     List<Book> getAll(int page, int amountByOnePage);
@@ -17,7 +17,7 @@ public interface BookRepository {
 
     List<Comment> getComments(long id);
 
-    Book update(long id, Book book);
+    void update(long id, Book book);
 
     void delete(long id);
 }

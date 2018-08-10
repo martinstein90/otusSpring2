@@ -1,7 +1,5 @@
 package com.martin.repository;
 
-import com.martin.caching.CachableFindById;
-import com.martin.caching.CachableGetAll;
 import com.martin.domain.Comment;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,11 +20,10 @@ public class CommentJpaRepository implements CommentRepository{
 
     @Transactional
     @Override
-    public Comment insert(Comment comment) {
+    public void insert(Comment comment) {
         checkInsert(comment);
 
         em.persist(comment);
-        return comment;
     }
 
     @Override
@@ -35,7 +32,6 @@ public class CommentJpaRepository implements CommentRepository{
         return (Long)query.getSingleResult();
     }
 
-    @CachableGetAll
     @Override
     public List<Comment> getAll(int page, int amountByOnePage) {
         checkGetAll(page, amountByOnePage);
@@ -46,7 +42,6 @@ public class CommentJpaRepository implements CommentRepository{
 
     }
 
-    @CachableFindById
     @Override
     public Comment findById(long id) {
         checkFindById(id);
@@ -56,14 +51,13 @@ public class CommentJpaRepository implements CommentRepository{
 
     @Transactional
     @Override
-    public Comment update(long id, Comment comment) {
+    public void update(long id, Comment comment) {
         checkUpdate(comment);
         checkUpdate(id);
 
         Comment byId = findById(id);
         byId.setComment(comment.getComment());
         em.merge(byId);
-        return byId;
     }
 
     @Transactional

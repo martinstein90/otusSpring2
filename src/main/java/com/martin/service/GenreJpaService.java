@@ -28,7 +28,7 @@ public class GenreJpaService implements GenreService{
     public Genre add(String title) throws Exception {
         Genre genre = new Genre(title);
         try{
-            genre = genreRepository.insert(genre);
+            genreRepository.insert(genre);
         }
         catch (DataIntegrityViolationException exception) {
             String causeMsg= exception.getCause().getCause().getMessage();
@@ -84,7 +84,7 @@ public class GenreJpaService implements GenreService{
     public Genre update(long id, String title) throws Exception {
         Genre genre = new Genre(title);
         try {
-            genre = genreRepository.update(id, genre);
+            genreRepository.update(id, genre);
         }
         catch (DataIntegrityViolationException exception) {
             throw new Exception(String.format(ERROR_STRING, Genre.class.getSimpleName()));
