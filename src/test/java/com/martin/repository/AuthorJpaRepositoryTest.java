@@ -3,14 +3,17 @@ package com.martin.repository;
 import com.martin.domain.Author;
 import com.martin.domain.Book;
 import com.martin.domain.Genre;
+import org.assertj.core.util.Sets;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static junit.framework.TestCase.assertTrue;
@@ -18,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+//@DataJpaTest //Todo и без нее все работает. А если она есть, то отключается мое логгтолвание через АОП!!!
 public class AuthorJpaRepositoryTest {
 
     @Autowired
@@ -30,129 +34,170 @@ public class AuthorJpaRepositoryTest {
     @Test
     public void checkInsertAuthor() {
         Author inserted = new Author("Sergey", "Esenin");
-        authorRepository.insert(inserted);
-        Author founded = authorRepository.findById(inserted.getId());
-        assertTrue(founded.equals(inserted));
+        authorRepository.save(inserted);
+        Optional<Author> founded = authorRepository.findById(inserted.getId());
+        assertTrue(founded.get().equals(inserted));
 
-        authorRepository.delete(inserted.getId());
+        authorRepository.deleteAll();
     }
 
     @Test
     public void checkCount()  {
-        long beforeCount = authorRepository.getCount();
+        long beforeCount = authorRepository.count();
         Author pushkin = new Author("Alex", "Pushkin");
-        authorRepository.insert(pushkin);
+        authorRepository.save(pushkin);
         Author esenin = new Author("Sergey", "Esenin");
-        authorRepository.insert(esenin);
+        authorRepository.save(esenin);
         Author tolstoy = new Author("Leo", "Tolstoy");
-        authorRepository.insert(tolstoy);
-        long afterCount = authorRepository.getCount();
+        authorRepository.save(tolstoy);
+        long afterCount = authorRepository.count();
         assertEquals(afterCount-beforeCount, 3);
 
-        authorRepository.delete(pushkin.getId());
-        authorRepository.delete(esenin.getId());
-        authorRepository.delete(tolstoy.getId());
+        authorRepository.deleteAll();
     }
 
     @Test
     public void checkGetAll()  {
         Author pushkin = new Author("Alex", "Pushkin");
-        authorRepository.insert(pushkin);
+        authorRepository.save(pushkin);
         Author tolstoy = new Author("Leo", "Tolstoy");
-        authorRepository.insert(tolstoy);
+        authorRepository.save(tolstoy);
         Author dostoevskiy = new Author("Fedor", "Dostoevskiy");
 
-        Set<Author> set = new HashSet<>(authorRepository.getAll(1, 100));
+
+        Set<Author> set = Sets.newHashSet(authorRepository.findAll());
 
         assertTrue(set.contains(pushkin) &&
                 set.contains(tolstoy) &&
                 !set.contains(dostoevskiy));
 
-        authorRepository.delete(pushkin.getId());
-        authorRepository.delete(tolstoy.getId());
+        authorRepository.deleteAll();
     }
 
     @Test
     public void checkGetBooks(){
         Author pushkin = new Author("Alex", "Pushkin");
-        authorRepository.insert(pushkin);
+        authorRepository.save(pushkin);
         Author levashov = new Author("Hikolay", "Levashov");
-        authorRepository.insert(levashov);
+        authorRepository.save(levashov);
         Genre genre = new Genre("Horror");
-        genreRepository.insert(genre);
+        genreRepository.save(genre);
 
         Book book1 = new Book("titl1", pushkin, genre);
-        bookRepository.insert(book1);
+        bookRepository.save(book1);
         Book book2 = new Book("titl2", pushkin, genre);
-        bookRepository.insert(book2);
+        bookRepository.save(book2);
         Book book3 = new Book("titl3", pushkin, genre);
-        bookRepository.insert(book3);
+        bookRepository.save(book3);
         Book book4 = new Book("titl4", levashov, genre);
-        bookRepository.insert(book4);
-
-        Set<Book> set = new HashSet<>(authorRepository.getBooks(pushkin.getId()));
+        bookRepository.save(book4);
+        Iterable<Book> books = authorRepository.getBooks(pushkin.getId());
+        for (Book b: books) {
+            System.out.println(b);
+        }
+        Set<Book> set = Sets.newHashSet(books);
 
         assertTrue(set.contains(book1) && set.contains(book2) &&
                 set.contains(book3) && !set.contains(book4));
 
-        bookRepository.delete(book1.getId());
-        bookRepository.delete(book2.getId());
-        bookRepository.delete(book3.getId());
-        bookRepository.delete(book4.getId());
-        authorRepository.delete(pushkin.getId());
-        authorRepository.delete(levashov.getId());
-        genreRepository.delete(genre.getId());
+        bookRepository.deleteAll();
+        authorRepository.deleteAll();
+        genreRepository.deleteAll();
     }
 
     @Test
     public void checkUpdate() {
         Author petrov = new Author("Alex", "Petrov");
-        authorRepository.insert(petrov);
+        authorRepository.save(petrov);
 
         String newLastname = "Kozlov";
-        Author updatedPetrov = new Author(petrov.getFirstname(), newLastname);
-        authorRepository.update(petrov.getId(), updatedPetrov);
+        petrov.setLastname(newLastname);
+        authorRepository.save(petrov);
 
-        Author byId = authorRepository.findById(petrov.getId());
-        assertTrue(byId.equals(updatedPetrov));
-        authorRepository.delete(petrov.getId());
+        Author byId = authorRepository.findById(petrov.getId()).get();
+        assertTrue(byId.getLastname().equals(newLastname));
+        authorRepository.deleteAll();
     }
 
     @Test
     public void checkDelete() {
         Author author1 = new Author("Alex", "Petrov");
-        authorRepository.insert(author1);
+        authorRepository.save(author1);
 
         Author author2 = new Author("Alex", "Sidorov");
-        authorRepository.insert(author2);
+        authorRepository.save(author2);
 
         Author author3 = new Author("Ivan", "Sidorov");
-        authorRepository.insert(author3);
+        authorRepository.save(author3);
 
-        authorRepository.delete(author1.getId());
+        authorRepository.deleteById(author1.getId());
 
-        List<Author> all = authorRepository.getAll(1, 100);
+        Iterable<Author> books = authorRepository.findAll();
+        Set<Author> all = Sets.newHashSet(books);
 
         assertTrue(!all.contains(author1) && all.contains(author2) && all.contains(author3));
 
-        authorRepository.delete(author2.getId());
-        authorRepository.delete(author3.getId());
+        authorRepository.deleteAll();
     }
 
     @Test
-    public void sqlInjectionTest() {
+    public void checkDeleteAuthorWithBook() {
         Author author1 = new Author("Alex", "Petrov");
-        authorRepository.insert(author1);
-
+        authorRepository.save(author1);
         Author author2 = new Author("Alex", "Sidorov");
-        authorRepository.insert(author2);
+        authorRepository.save(author2);
+        Author author3 = new Author("Ivan", "Sidorov");
+        authorRepository.save(author3);
 
-        authorRepository.update(1, new Author("Alex", "; drop table authors"));
+        Genre genre1 = new Genre("Horror");
+        genreRepository.save(genre1);
+        Genre genre2 = new Genre("Comedy");
+        genreRepository.save(genre2);
 
-        Author byId = authorRepository.findById(1);
-        System.out.println(byId);
+        Book book1 = new Book("titl1", author1, genre1);
+        bookRepository.save(book1);
+        Book book2 = new Book("titl2", author2, genre2);
+        bookRepository.save(book2);
 
-        authorRepository.delete(author1.getId());
-        authorRepository.delete(author2.getId());
+        authorRepository.deleteById(author1.getId());
+
+        System.out.println("----------------------------");
+        Iterable<Author> authors = authorRepository.findAll();
+        for (Author author:authors) {
+            System.out.println(author);
+        }
+        Iterable<Genre> genres = genreRepository.findAll();
+        for (Genre genre: genres) {
+            System.out.println(genre);
+        }
+        Iterable<Book> books = bookRepository.findAll();
+        for (Book book: books) {
+            System.out.println(book);
+        }
+
+        Set<Author> setAuthors = Sets.newHashSet(authors);
+        Set<Book> setBooks = Sets.newHashSet(books);
+        assertTrue(!setAuthors.contains(author1) && setAuthors.contains(author2) && setAuthors.contains(author3));
+        assertTrue( !setBooks.contains(book1) && setBooks.contains(book2));
+
+        authorRepository.deleteAll();
+        genreRepository.deleteAll();
+        bookRepository.deleteAll();
     }
+
+
+    @Test
+    public void sqlInjectionTest() {
+        Author author1 = new Author("Ivan",  "Petrov");
+        authorRepository.save(author1);
+
+        Author author2 = new Author("Alex",  "; drop table authors");
+        authorRepository.save(author2);
+
+        Author byId = authorRepository.findById(author1.getId()).get();
+        assertTrue(author1.equals(byId));
+
+        authorRepository.deleteAll();
+    }
+
 }

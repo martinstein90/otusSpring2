@@ -15,4 +15,6 @@ public interface GenreService {
     List<Book> getBooks(long id);
     Genre update(long id, String title) throws Exception;
     void delete(long id) throws Exception;
+    void delete(long id, boolean withBook) throws Exception;
+    void deleteAll();
 }

@@ -11,7 +11,7 @@ public class Comment implements Storable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(length = 100)
+    @Column(name = "comment", length = 100)
     private String comment;
 
     @ManyToOne
@@ -32,6 +32,10 @@ public class Comment implements Storable{
 
     public String getComment() {
         return comment;
+    }
+
+    public void setBook(Book book) {
+        this.book = book;
     }
 
     public Book getBook() {

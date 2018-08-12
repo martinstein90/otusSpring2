@@ -4,6 +4,7 @@ import com.martin.domain.Author;
 import com.martin.domain.Book;
 import com.martin.domain.Comment;
 import com.martin.domain.Genre;
+import org.assertj.core.util.Lists;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +32,6 @@ public class CommentJpaRepositoryTest {
     @Autowired
     private GenreRepository genreRepository;
 
-
     private Genre horror, comedy;
     private Author pushkin, esenin, tolstoy;
     private Book ruslanLudmila, blackMan;
@@ -39,106 +39,100 @@ public class CommentJpaRepositoryTest {
     @Before
     public void setUp() {
         horror = new Genre("Horror");
-        genreRepository.insert(horror);
+        genreRepository.save(horror);
         comedy = new Genre("Comedy");
-        genreRepository.insert(comedy);
+        genreRepository.save(comedy);
         pushkin = new Author("Alex", "Pushkin");
-        authorRepository.insert(pushkin);
+        authorRepository.save(pushkin);
         esenin = new Author("Sergey", "Esenin");
-        authorRepository.insert(esenin);
+        authorRepository.save(esenin);
         tolstoy = new Author("Leo", "Tolstoy");
-        authorRepository.insert(tolstoy);
+        authorRepository.save(tolstoy);
         ruslanLudmila = new Book("Ruslan and Ludmila", pushkin, comedy);
-        bookRepository.insert(ruslanLudmila);
+        bookRepository.save(ruslanLudmila);
         blackMan =  new Book("Black man", pushkin, horror);
-        bookRepository.insert(blackMan);
+        bookRepository.save(blackMan);
     }
 
     @After
     public void tearDown() {
-        bookRepository.delete(ruslanLudmila.getId());
-        bookRepository.delete(blackMan.getId());
-        genreRepository.delete(horror.getId());
-        genreRepository.delete(comedy.getId());
-        authorRepository.delete(pushkin.getId());
-        authorRepository.delete(esenin.getId());
-        authorRepository.delete(tolstoy.getId());
+        bookRepository.deleteAll();
+        genreRepository.deleteAll();
+        authorRepository.deleteAll();
     }
 
     @Test
     public void checkInsertComment() {
         Comment inserted = new Comment( "Super", blackMan);
-        commentRepository.insert(inserted);
-        Comment founded = commentRepository.findById(inserted.getId());
+        commentRepository.save(inserted);
+        Comment founded = commentRepository.findById(inserted.getId()).get();
         assertTrue(founded.equals(inserted));
 
-        commentRepository.delete(inserted.getId());
+        commentRepository.deleteAll();
     }
 
     @Test
     public void checkCount()  {
-        long beforeCount = commentRepository.getCount();
+        long beforeCount = commentRepository.count();
         Comment comment1 = new Comment( "Super", ruslanLudmila);
-        commentRepository.insert(comment1);
+        commentRepository.save(comment1);
         Comment comment2 = new Comment( "Super", ruslanLudmila);
-        commentRepository.insert(comment2);
+        commentRepository.save(comment2);
         Comment comment3 = new Comment( "Super", blackMan);
-        commentRepository.insert(comment3);
-        long afterCount = commentRepository.getCount();
+        commentRepository.save(comment3);
+        long afterCount = commentRepository.count();
 
         assertEquals(afterCount-beforeCount, 3);
 
-        commentRepository.delete(comment1.getId());
-        commentRepository.delete(comment2.getId());
-        commentRepository.delete(comment3.getId());
+        commentRepository.deleteAll();
     }
 
     @Test
     public void checkGetAll()  {
         Comment comment1 = new Comment( "Super", ruslanLudmila);
-        commentRepository.insert(comment1);
+        commentRepository.save(comment1);
         Comment comment2 = new Comment( "Super", blackMan);
-        commentRepository.insert(comment2);
+        commentRepository.save(comment2);
         Comment comment3 = new Comment( "Fail", blackMan);
-        List<Comment> list = commentRepository.getAll(1, 100);
+        List<Comment> list = Lists.newArrayList(commentRepository.findAll());
 
         assertTrue(list.contains(comment1) &&
                 list.contains(comment2) &&
                 !list.contains(comment3));
 
-        commentRepository.delete(comment1.getId());
-        commentRepository.delete(comment2.getId());
+        commentRepository.deleteAll();
     }
 
     @Test
     public void checkUpdate() {
         Comment comment = new Comment( "Super", ruslanLudmila);
-        commentRepository.insert(comment);
+        commentRepository.save(comment);
 
-        String title = "newComment";
-        Comment updated = new Comment(title, null);
-        commentRepository.update(comment.getId(), updated);
+        String newComment = "newComment";
+        comment.setComment(newComment);
+        commentRepository.save(comment);
 
-        Comment byId = commentRepository.findById(comment.getId());
+        Comment byId = commentRepository.findById(comment.getId()).get();
 
-        assertTrue(byId.getComment().equals(title));
+        assertTrue(byId.getComment().equals(newComment));
 
-        commentRepository.delete(comment.getId());
+        commentRepository.deleteAll();
     }
 
     @Test
     public void checkDelete() {
         Comment comment1 = new Comment( "Super1", ruslanLudmila);
-        commentRepository.insert(comment1);
+        commentRepository.save(comment1);
         Comment comment2 = new Comment( "Super2", blackMan);
-        commentRepository.insert(comment2);
+        commentRepository.save(comment2);
 
-        commentRepository.delete(comment1.getId());
+        commentRepository.deleteById(comment1.getId());
 
-        List<Comment> all = commentRepository.getAll(1, 100);
+        List<Comment> all = Lists.newArrayList(commentRepository.findAll());
 
         assertTrue(!all.contains(comment1) && all.contains(comment2) );
 
-        commentRepository.delete(comment2.getId());
+        commentRepository.deleteAll();
     }
+
 }

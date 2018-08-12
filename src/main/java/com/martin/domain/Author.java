@@ -3,6 +3,8 @@ package com.martin.domain;
 import javax.persistence.*;
 import java.util.*;
 
+import static javax.persistence.CascadeType.ALL;
+
 @Entity
 @Table(name = "authors")
 public class Author  implements Storable{
@@ -11,8 +13,10 @@ public class Author  implements Storable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "firstname", length = 32)
     private String firstname;
 
+    @Column(name = "lastname", length = 32)
     private String lastname;
 
     @OneToMany(mappedBy="author", fetch=FetchType.LAZY)

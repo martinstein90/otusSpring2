@@ -2,22 +2,13 @@ package com.martin.repository;
 
 import com.martin.domain.Book;
 import com.martin.domain.Genre;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-import java.util.List;
+public interface GenreRepository extends PagingAndSortingRepository<Genre, Long> {
 
-public interface GenreRepository {
+    @Query("select b from Book b left join b.genre g where g.id = ?1")
+    Iterable<Book> getBooks(long id);
 
-    void insert(Genre genre);
-
-    long getCount();
-    List<Genre> getAll(int page, int amountByOnePage);
-
-    Genre findById(long id);
-    List<Genre> find(Genre genre);
-
-    List<Book> getBooks(long id);
-
-    void update(long id, Genre genre);
-
-    void delete(long id);
+    Iterable<Genre> findByTitle(String title);
 }

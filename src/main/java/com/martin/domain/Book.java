@@ -4,6 +4,8 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
 
+import static javax.persistence.CascadeType.ALL;
+
 @Entity
 @Table(name = "books")
 public class Book implements Storable{
@@ -12,6 +14,7 @@ public class Book implements Storable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "title", length = 32)
     private String title;
 
     @ManyToOne

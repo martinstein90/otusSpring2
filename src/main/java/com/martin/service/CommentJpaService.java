@@ -1,19 +1,24 @@
 package com.martin.service;
 
+import com.google.common.collect.Lists;
+import com.martin.domain.Book;
 import com.martin.domain.Comment;
+import com.martin.domain.Genre;
 import com.martin.repository.CommentRepository;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
+import java.util.Optional;
 
-public class CommentJpaService implements CommentService{
+import static com.martin.service.Helper.*;
+import static com.martin.service.Helper.handlerException;
+
+public class CommentJpaService implements CommentService
+{
 
     private final CommentRepository commentRepository;
     private final BookService bookService;
-
-    private final String ERROR_STRING = "Операция с объектом %s не выполнена";
-    private final String DUPLICATE_ERROR_STRING = "Запись %s существует";
-    private final String EMPTY_RESULT_BY_ID_ERROR_STRING = "Объект %s c id %d не найден";
 
     public CommentJpaService(CommentRepository commentRepository,
                              BookService bookService) {
@@ -23,63 +28,77 @@ public class CommentJpaService implements CommentService{
 
 
     @Override
-    public void add(String comment, int bookId) throws Exception {
-        Comment com = new Comment(comment, bookService.findById(bookId));
-        try {
-            commentRepository.insert(com);
+    public Comment add(String com, int bookId) throws Exception {
+        Comment comment = new Comment(com, bookService.findById(bookId));
+        try{
+            commentRepository.save(comment);
         }
         catch (DataIntegrityViolationException exception) {
-            if(exception.getCause().getCause().getMessage().contains("Нарушение уникального индекса или первичного ключ"))
-                throw new Exception(String.format(DUPLICATE_ERROR_STRING, com));
-            else
-                throw new Exception(String.format(ERROR_STRING, com));
+            handlerException(exception, comment.toString());
         }
+        return comment;
     }
 
     @Override
     public long getCount() {
-        return commentRepository.getCount();
+        return commentRepository.count();
 
     }
 
     @Override
     public List<Comment> getAll(int page, int amountByOnePage) {
-        return commentRepository.getAll(page, amountByOnePage);
+        return commentRepository.findAll(PageRequest.of(page,amountByOnePage)).getContent();
     }
 
     @Override
     public Comment findById(long id) throws Exception {
-        Comment com;
-        try {
-            com = commentRepository.findById(id);
-        }
-        catch (DataIntegrityViolationException exception) {
-            throw new Exception(String.format(ERROR_STRING, Comment.class.getSimpleName()));
-        }
-        return com;
+        Optional<Comment> byId = commentRepository.findById(id);
+        if(!byId.isPresent())
+            throw new Exception(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Comment.class.getSimpleName(), id));
+        return byId.get();
     }
 
     @Override
-    public Comment update(long id, String comment, int bookId) throws Exception {
-        Comment com = new Comment(comment, bookService.findById(bookId));
+    public List<Comment> find(String subTitle) throws Exception {
+        List<Comment> comments = null;
         try {
-            commentRepository.update(id, com);
+            comments = Lists.newArrayList(commentRepository.findByCommentLike("%" + subTitle + "%" ));
         }
         catch (DataIntegrityViolationException exception) {
-            System.out.println(exception.getMessage());
-            throw new Exception(String.format(ERROR_STRING, Comment.class.getSimpleName()));
+            handlerException(exception, Genre.class.getSimpleName());
         }
-        return com;
+        return comments;
+    }
+
+    @Override
+    public Comment update(long id, String comm, int bookId) throws Exception {
+        Comment comment = commentRepository.findById(id).get();
+        if(comm!= null)
+            comment.setComment(comm);
+        if(bookId != 0)
+            comment.setBook(bookService.findById(bookId));
+        try {
+            commentRepository.save(comment);
+        }
+        catch (DataIntegrityViolationException exception) {
+            handlerException(exception, Book.class.getSimpleName());
+        }
+
+        return comment;
     }
 
     @Override
     public void delete(long id) throws Exception {
         try {
-            commentRepository.delete(id);
+            commentRepository.deleteById(id);
         }
         catch (DataIntegrityViolationException exception) {
-            System.out.println(exception.getMessage());
-            throw new Exception(String.format(ERROR_STRING, Comment.class.getSimpleName()));
+            handlerException(exception, Comment.class.getSimpleName());
         }
+    }
+
+    @Override
+    public void deleteAll() {
+        commentRepository.deleteAll();
     }
 }

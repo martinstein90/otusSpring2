@@ -13,6 +13,7 @@ public class Genre implements Storable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "title", length = 32)
     private String title;
 
     @OneToMany(mappedBy="genre", fetch=FetchType.LAZY)

@@ -17,4 +17,5 @@ public interface BookService {
     Book update(long id, String title) throws Exception;
     Book update(long id, String bookTitle, int authorId, int genreId) throws Exception;
     void delete(long id) throws Exception;
+    void deleteAll();
 }

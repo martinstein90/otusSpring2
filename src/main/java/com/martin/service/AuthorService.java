@@ -15,4 +15,6 @@ public interface AuthorService {
     List<Book> getBooks(long id);
     Author update(long id, String firstname, String lastname) throws Exception;
     void delete(long id) throws Exception;
+    void delete(long id, boolean withBook) throws Exception;
+    void deleteAll();
 }

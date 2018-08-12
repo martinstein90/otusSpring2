@@ -1,21 +1,25 @@
 package com.martin.service;
 
+import com.google.common.collect.Lists;
 import com.martin.domain.Author;
 import com.martin.domain.Book;
 import com.martin.domain.Comment;
 import com.martin.domain.Genre;
 import com.martin.repository.BookRepository;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import static com.martin.service.Helper.EMPTY_RESULT_BY_ID_ERROR_STRING;
+import static com.martin.service.Helper.handlerException;
 
 @Service
-public class BookJpaService implements BookService {
-
-    private final String ERROR_STRING = "Операция с объектом %s не выполнена";
-    private final String DUPLICATE_ERROR_STRING = "Запись %s существует";
-    private final String EMPTY_RESULT_BY_ID_ERROR_STRING = "Объект %s c id %d не найден";
+public class BookJpaService implements BookService
+{
 
     private final BookRepository bookRepository;
     private final AuthorService authorService;
@@ -48,92 +52,92 @@ public class BookJpaService implements BookService {
 
     private Book add(Book book) throws Exception {
         try{
-            bookRepository.insert(book);
+            bookRepository.save(book);
         }
         catch (DataIntegrityViolationException exception) {
-            String causeMsg= exception.getCause().getCause().getMessage();
-            if(causeMsg.contains("Нарушение уникального индекса или первичного ключ"))
-                throw new Exception(String.format(DUPLICATE_ERROR_STRING, book));
-            else
-                throw new Exception(String.format(ERROR_STRING, book));
+            handlerException(exception, book.toString());
         }
         return book;
     }
 
     @Override
     public long getCount() {
-        return bookRepository.getCount();
+        return bookRepository.count();
     }
 
     @Override
     public List<Book> getAll(int page, int amountByOnePage) {
-        return bookRepository.getAll(page, amountByOnePage);
+        return bookRepository.findAll(PageRequest.of(page,amountByOnePage)).getContent();
+
     }
 
     @Override
-    public List<Book> findByTitle(String title) throws Exception {
-        Book book = new Book(title, null, null);
-        List<Book> books;
+    public List<Book> findByTitle(String subTitle) throws Exception {
+        List<Book> books = null;
         try {
-            books = bookRepository.find(book);
+            books = Lists.newArrayList(bookRepository.findByTitleLike("%" + subTitle + "%" ));
         }
         catch (DataIntegrityViolationException exception) {
-            throw new Exception(String.format(ERROR_STRING, Book.class.getSimpleName()));
+            handlerException(exception, Book.class.getSimpleName());
         }
+
         return books;
     }
 
     @Override
     public Book findById(long id) throws Exception {
-        Book book;
+        Optional<Book> byId = bookRepository.findById(id);
+        if(!byId.isPresent())
+            throw new Exception(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Book.class.getSimpleName(), id));
+        return byId.get();
+    }
+
+
+    @Override
+    public List<Comment> getComments(long id) {
+        return Lists.newArrayList(bookRepository.getComments(id));
+    }
+
+    @Override
+    public Book update(long id, String title) throws Exception {
+        Book book = bookRepository.findById(id).get();
+        if(title!= null)
+            book.setTitle(title);
         try {
-            book = bookRepository.findById(id);
+            bookRepository.save(book);
         }
         catch (DataIntegrityViolationException exception) {
-            throw new Exception(String.format(ERROR_STRING, Book.class.getSimpleName()));
+            handlerException(exception, Book.class.getSimpleName());
         }
         return book;
     }
 
     @Override
-    public List<Comment> getComments(long id) {
-        return bookRepository.getComments(id);
-    }
-
-    @Override
-    public Book update(long bookId, String title) throws Exception {
-        Book currentBook = findById(bookId);
-        Book newBook = new Book(title, currentBook.getAuthor(), currentBook.getGenre());
-        try{
-            bookRepository.update(bookId, newBook);
-        }
-        catch (DataIntegrityViolationException exception) {
-            throw new Exception(String.format(ERROR_STRING, Book.class.getSimpleName()));
-        }
-        return null;
-    }
-
-    @Override
     public Book update(long id, String bookTitle, int authorId, int genreId) throws Exception {
-        Book newBook = null;//new Book(bookTitle, findAuthorById(authorId), findById(genreId));
-        int amountUpdated;
+        Book book = new Book(bookTitle, authorService.findById(authorId), genreService.findById(genreId));
+        if(bookTitle!= null)
+            book.setTitle(bookTitle);
         try{
-            bookRepository.update(id, newBook);
+            bookRepository.save(book);
         }
         catch (DataIntegrityViolationException exception) {
-            throw new Exception(String.format(ERROR_STRING, Book.class.getSimpleName()));
+            handlerException(exception, Book.class.getSimpleName());
         }
-        return newBook;
+        return book;
     }
 
     @Override
     public void delete(long id) throws Exception {
         try {
-            bookRepository.delete(id);
+            bookRepository.deleteById(id);
         }
         catch (DataIntegrityViolationException exception) {
-            throw new Exception(String.format(ERROR_STRING, Author.class.getSimpleName()));
+            handlerException(exception, Book.class.getSimpleName());
         }
     }
 
+    @Override
+    public void deleteAll() {
+        bookRepository.deleteAll();
+    }
 }

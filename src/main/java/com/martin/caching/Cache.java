@@ -22,15 +22,12 @@ import static java.lang.String.format;
 @Component
 public class Cache {
 
-    private final String WORKING_COLOR = ANSI_GREEN;
-    private final String RESET_COLOR = ANSI_RESET;
-
     private static final Map<Long, Author> authorCache = new HashMap<>();
     private static final Map<Long, Genre> genreCache = new HashMap<>();
     private static final Map<Long, Book> bookCache = new HashMap<>();
     private static final Map<Long, Comment> commentCache = new HashMap<>();
 
-
+/*
     @AfterReturning(pointcut = "@annotation(com.martin.caching.CachableGetAll)", returning = "res")
     public void addToCache(JoinPoint point, Object res) {
         Map cache = null;
@@ -102,5 +99,7 @@ public class Cache {
     private void showMessage(String str) {
         System.out.println(WORKING_COLOR + str + RESET_COLOR);
     }
+
+*/
 }
 

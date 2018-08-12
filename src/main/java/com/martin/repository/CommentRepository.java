@@ -1,19 +1,9 @@
 package com.martin.repository;
 
 import com.martin.domain.Comment;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-import java.util.List;
+public interface CommentRepository extends PagingAndSortingRepository<Comment, Long> {
 
-public interface CommentRepository {
-
-    void insert(Comment comment);
-
-    long getCount();
-    List<Comment> getAll(int page, int amountByOnePage);
-
-    Comment findById(long id);
-
-    void update(long id, Comment comment);
-
-    void delete(long id);
+    Iterable<Comment> findByCommentLike(String sub);
 }

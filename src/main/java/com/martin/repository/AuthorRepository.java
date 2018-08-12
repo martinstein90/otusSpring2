@@ -2,22 +2,14 @@ package com.martin.repository;
 
 import com.martin.domain.Author;
 import com.martin.domain.Book;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-import java.util.List;
 
-public interface AuthorRepository {
+public interface AuthorRepository extends PagingAndSortingRepository<Author, Long> {
 
-    void insert(Author author);
+    @Query("select b from Book b left join b.author a where a.id = ?1")
+    Iterable<Book> getBooks(long id);
 
-    long getCount();
-    List<Author> getAll(int page, int amountByOnePage);
-
-    Author findById(long id);
-    List<Author> find(Author author);
-
-    List<Book> getBooks(long id);
-
-    void update(long id, Author author);
-
-    void delete(long id);
+    Iterable<Author> findByFirstnameOrLastname(String firstname, String lastname);
 }

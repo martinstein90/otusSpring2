@@ -11,12 +11,12 @@ import static com.martin.helper.Ansi.*;
 @Component
 public class Logging {
 
-    private final String WORKING_COLOR = ANSI_BLUE;
-    private final String RESET_COLOR = ANSI_RESET;
-
     @Before("execution(* com.martin.repository.*.*(..))")
     public void logBefore(JoinPoint point) {
-        System.out.printf(WORKING_COLOR + "============== Вызов метода %s==============\n" + RESET_COLOR, point.getSignature().getName());
+        showInfo(point.getSignature().getName());
+    }
 
+    private void showInfo(String str) {
+        System.out.print(ANSI_BLUE + "============== Вызов метода " + str + " ==============\n" + ANSI_BLACK);
     }
 }

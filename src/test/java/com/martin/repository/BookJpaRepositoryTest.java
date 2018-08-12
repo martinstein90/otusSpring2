@@ -4,6 +4,8 @@ import com.martin.domain.Author;
 import com.martin.domain.Book;
 import com.martin.domain.Comment;
 import com.martin.domain.Genre;
+import org.assertj.core.util.Lists;
+import org.assertj.core.util.Sets;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,86 +40,109 @@ public class BookJpaRepositoryTest {
     @Before
     public void setUp() {
         horror = new Genre("Horror");
-        genreRepository.insert(horror);
+        genreRepository.save(horror);
         comedy = new Genre("Comedy");
-        genreRepository.insert(comedy);
+        genreRepository.save(comedy);
         pushkin = new Author("Alex", "Pushkin");
-        authorRepository.insert(pushkin);
+        authorRepository.save(pushkin);
         esenin = new Author("Sergey", "Esenin");
-        authorRepository.insert(esenin);
+        authorRepository.save(esenin);
         tolstoy = new Author("Leo", "Tolstoy");
-        authorRepository.insert(tolstoy);
+        authorRepository.save(tolstoy);
     }
 
     @After
     public void tearDown() {
-        genreRepository.delete(horror.getId());
-        genreRepository.delete(comedy.getId());
-        authorRepository.delete(pushkin.getId());
-        authorRepository.delete(esenin.getId());
-        authorRepository.delete(tolstoy.getId());
+        genreRepository.deleteAll();
+        authorRepository.deleteAll();
     }
 
     @Test
     public void checkInsertBook() {
         Book book = new Book( "Book1", pushkin, horror);
-        bookRepository.insert(book);
-        Book founded = bookRepository.findById(book.getId());
+        bookRepository.save(book);
+        Book founded = bookRepository.findById(book.getId()).get();
         assertTrue(founded.equals(founded));
 
-        bookRepository.delete(book.getId());
+        bookRepository.deleteAll();
     }
 
     @Test
     public void checkCount()  {
-        long beforeCount = bookRepository.getCount();
+        long beforeCount = bookRepository.count();
         Book book1 = new Book( "Book1", pushkin, horror);
-        bookRepository.insert(book1);
+        bookRepository.save(book1);
         Book book2 = new Book( "Book2", pushkin, comedy);
-        bookRepository.insert(book2);
+        bookRepository.save(book2);
         Book book3 = new Book( "Book3", esenin, comedy);
-        bookRepository.insert(book3);
-        long afterCount = bookRepository.getCount();
+        bookRepository.save(book3);
+        long afterCount = bookRepository.count();
 
         assertEquals(afterCount-beforeCount, 3);
 
-        bookRepository.delete(book1.getId());
-        bookRepository.delete(book2.getId());
-        bookRepository.delete(book3.getId());
+        bookRepository.deleteAll();
     }
 
     @Test
     public void checkGetAll()  {
         Book book1 = new Book( "Book1", esenin, horror);
-        bookRepository.insert(book1);
+        bookRepository.save(book1);
         Book book2 = new Book( "Book2", pushkin, comedy);
-        bookRepository.insert(book2);
+        bookRepository.save(book2);
         Book book3 = new Book( "Book3", tolstoy, comedy);
-        List<Book> list = bookRepository.getAll(1, 100);
+        List<Book> list = Lists.newArrayList(bookRepository.findAll());
 
         assertTrue(list.contains(book1) &&
                 list.contains(book2) &&
                 !list.contains(book3));
 
-        bookRepository.delete(book1.getId());
-        bookRepository.delete(book2.getId());
+        bookRepository.deleteAll();
     }
 
+    @Test
+    public void checkGetComment() {
+        Book book = new Book("Book1", pushkin, horror);
+        bookRepository.save(book);
+        Comment comment1 = new Comment("Comment1", book);
+        commentRepository.save(comment1);
+        Comment comment2 = new Comment("Comment2", book);
+        commentRepository.save(comment2);
+
+        Iterable<Comment> comments = bookRepository.getComments(book.getId());
+        for (Comment comment: comments) {
+            System.out.println(comment);
+        }
+
+        Set<Comment> setComments = Sets.newHashSet(comments);
+
+        assertTrue(setComments.contains(comment1) && setComments.contains(comment2));
+        commentRepository.deleteAll();
+        bookRepository.deleteAll();
+    }
 
     @Test
-    public void getComment() {
-        Book book = new Book("Book1", pushkin, horror);
-        bookRepository.insert(book);
-        Comment comment1 = new Comment("Comment1", book);
-        commentRepository.insert(comment1);
-        Comment comment2 = new Comment("Comment2", book);
-        commentRepository.insert(comment2);
+    public void checkDeleteBookWithComments() {
+        Book book1 = new Book("Book1", pushkin, horror);
+        bookRepository.save(book1);
+        Book book2 = new Book("Book2", tolstoy, comedy);
+        bookRepository.save(book2);
+        Comment comment1 = new Comment("Comment1", book1);
+        commentRepository.save(comment1);
+        Comment comment2 = new Comment("Comment2", book1);
+        commentRepository.save(comment2);
+        Comment comment3 = new Comment("Comment3", book2);
+        commentRepository.save(comment3);
 
-        Set<Comment> comments = new HashSet<>(bookRepository.getComments(book.getId()));
+        bookRepository.deleteById(book1.getId());
 
-        assertTrue(comments.contains(comment1) && comments.contains(comment2));
-        commentRepository.delete(comment1.getId());
-        commentRepository.delete(comment2.getId());
-        bookRepository.delete(book.getId());
+        Iterable<Comment> comments = commentRepository.findAll();
+        for (Comment comment: comments) {
+            System.out.println(comment);
+        }
+
+        Set<Comment> setComments = Sets.newHashSet(comments);
+        assertTrue(!setComments.contains(comment1) && !setComments.contains(comment2) && setComments.contains(comment3));
+
+        commentRepository.deleteAll();
     }
 }
