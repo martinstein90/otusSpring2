@@ -1,6 +1,7 @@
 package com.martin.service;
 
 import com.google.common.collect.Lists;
+import com.martin.caching.Cachable;
 import com.martin.domain.Author;
 import com.martin.domain.Book;
 import com.martin.repository.AuthorRepository;
@@ -18,7 +19,6 @@ public class AuthorJpaService implements AuthorService
 {
 
     private final AuthorRepository authorRepository;
-
 
     public AuthorJpaService(AuthorRepository authorRepository) {
         this.authorRepository = authorRepository;
@@ -41,6 +41,7 @@ public class AuthorJpaService implements AuthorService
         return authorRepository.count();
     }
 
+    @Cachable(target = Author.class)
     @Override
     public List<Author> getAll(int page, int amountByOnePage) {
         return authorRepository.findAll(PageRequest.of(page,amountByOnePage)).getContent();

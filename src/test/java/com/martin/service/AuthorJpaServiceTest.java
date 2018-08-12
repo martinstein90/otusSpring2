@@ -1,6 +1,8 @@
 package com.martin.service;
 
+import com.martin.caching.Cache;
 import com.martin.domain.Author;
+import com.martin.domain.Storable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +10,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
+import java.util.Map;
 
+import static com.jayway.jsonpath.spi.cache.CacheProvider.getCache;
 import static com.martin.service.Helper.DUPLICATE_ERROR_STRING;
 import static com.martin.service.Helper.EMPTY_RESULT_BY_ID_ERROR_STRING;
 import static com.martin.service.Helper.FORMAT_ERROR_STRING;
@@ -21,6 +25,32 @@ public class AuthorJpaServiceTest {
 
     @Autowired
     private AuthorService authorService;
+
+    @Test
+    public void checkCacheAfterAddAuthor() throws Exception {
+
+        Author aPetrov = authorService.add("Alex", "Petrov");
+        Author iPetrov =authorService.add("Ivan", "Petrov");
+        Author kPetrov =authorService.add("Kirill", "Petrov");
+
+        List<Author> all = authorService.getAll(0, 100);
+        for (Author a: all) {
+            System.out.println(a);
+        }
+        Map<Long, ? extends Storable> cache = Cache.getCache(Author.class);
+        Author aPetrovCache = (Author) cache.get(aPetrov.getId());
+        System.out.println("aPetrovCache = " + aPetrovCache);
+        Author iPetrovCache = (Author)cache.get(iPetrov.getId());
+        System.out.println("iPetrovCache = " + iPetrovCache);
+        Author kPetrovCache = (Author)cache.get(kPetrov.getId());
+        System.out.println("kPetrovCache = " + kPetrovCache);
+
+        assertEquals(aPetrov, aPetrovCache);
+        assertEquals(iPetrov, iPetrovCache);
+        assertEquals(kPetrov, kPetrovCache);
+
+        authorService.deleteAll();
+    }
 
     @Test
     public void getExceptionAfterDoubleInsertOneAuthor() throws Exception {
@@ -70,6 +100,7 @@ public class AuthorJpaServiceTest {
         assertEquals(after-before, 3);
         authorService.deleteAll();
     }
+
 
     @Test
     public void getExceptionAfterFindByIdWithNotRealId() throws Exception {
