@@ -52,17 +52,16 @@ public class CommentJpaService implements CommentService
 
     @Override
     public Comment findById(long id) throws Exception {
-        Optional<Comment> byId = commentRepository.findById(id);
-        if(!byId.isPresent())
-            throw new Exception(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Comment.class.getSimpleName(), id));
-        return byId.get();
+        Comment byId = commentRepository.findById(id).orElseThrow(()->
+                new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Comment.class.getSimpleName(), id)));
+        return byId;
     }
 
     @Override
     public List<Comment> find(String subTitle) throws Exception {
         List<Comment> comments = null;
         try {
-            comments = Lists.newArrayList(commentRepository.findByCommentLike("%" + subTitle + "%" ));
+            comments = Lists.newArrayList(commentRepository.findByCommentContaining(subTitle));
         }
         catch (DataIntegrityViolationException exception) {
             handlerException(exception, Genre.class.getSimpleName());
@@ -72,7 +71,8 @@ public class CommentJpaService implements CommentService
 
     @Override
     public Comment update(long id, String comm, int bookId) throws Exception {
-        Comment comment = commentRepository.findById(id).get();
+        Comment comment = commentRepository.findById(id).orElseThrow(()->
+                new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Comment.class.getSimpleName(), id)));;
         if(comm!= null)
             comment.setComment(comm);
         if(bookId != 0)
@@ -83,7 +83,6 @@ public class CommentJpaService implements CommentService
         catch (DataIntegrityViolationException exception) {
             handlerException(exception, Book.class.getSimpleName());
         }
-
         return comment;
     }
 

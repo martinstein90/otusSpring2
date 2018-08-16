@@ -8,5 +8,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public interface BookRepository extends PagingAndSortingRepository<Book, Long> {
     @Query("select c from Comment c left join c.book b where b.id = ?1")
     Iterable<Comment> getComments(long id);
-    Iterable<Book> findByTitleLike(String sub);
+    Iterable<Book> findByTitleContaining(String sub);
 }

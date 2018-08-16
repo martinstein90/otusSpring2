@@ -56,6 +56,7 @@ public class CommentJpaRepositoryTest {
 
     @After
     public void tearDown() {
+        commentRepository.deleteAll();
         bookRepository.deleteAll();
         genreRepository.deleteAll();
         authorRepository.deleteAll();
@@ -67,8 +68,6 @@ public class CommentJpaRepositoryTest {
         commentRepository.save(inserted);
         Comment founded = commentRepository.findById(inserted.getId()).get();
         assertTrue(founded.equals(inserted));
-
-        commentRepository.deleteAll();
     }
 
     @Test
@@ -83,8 +82,6 @@ public class CommentJpaRepositoryTest {
         long afterCount = commentRepository.count();
 
         assertEquals(afterCount-beforeCount, 3);
-
-        commentRepository.deleteAll();
     }
 
     @Test
@@ -99,8 +96,6 @@ public class CommentJpaRepositoryTest {
         assertTrue(list.contains(comment1) &&
                 list.contains(comment2) &&
                 !list.contains(comment3));
-
-        commentRepository.deleteAll();
     }
 
     @Test
@@ -115,8 +110,6 @@ public class CommentJpaRepositoryTest {
         Comment byId = commentRepository.findById(comment.getId()).get();
 
         assertTrue(byId.getComment().equals(newComment));
-
-        commentRepository.deleteAll();
     }
 
     @Test
@@ -131,8 +124,6 @@ public class CommentJpaRepositoryTest {
         List<Comment> all = Lists.newArrayList(commentRepository.findAll());
 
         assertTrue(!all.contains(comment1) && all.contains(comment2) );
-
-        commentRepository.deleteAll();
     }
 
 }

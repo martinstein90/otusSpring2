@@ -17,8 +17,8 @@ import static com.martin.service.Helper.EMPTY_RESULT_BY_ID_ERROR_STRING;
 import static com.martin.service.Helper.handlerException;
 
 @Service
-public class GenreJpaService implements GenreService
-{
+public class GenreJpaService implements GenreService {
+
     private final GenreRepository genreRepository;
 
     public GenreJpaService(GenreRepository genreRepository) {
@@ -49,10 +49,9 @@ public class GenreJpaService implements GenreService
 
     @Override
     public Genre findById(long id) throws Exception {
-        Optional<Genre> byId = genreRepository.findById(id);
-        if(!byId.isPresent())
-            throw new Exception(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Genre.class.getSimpleName(), id));
-        return byId.get();
+        Genre byId = genreRepository.findById(id).orElseThrow(()->
+                new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Genre.class.getSimpleName(), id)));
+           return byId;
     }
 
     @Override
@@ -74,7 +73,8 @@ public class GenreJpaService implements GenreService
 
     @Override
     public Genre update(long id, String title) throws Exception {
-        Genre genre = genreRepository.findById(id).get();
+        Genre genre = genreRepository.findById(id).orElseThrow(()->
+                new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Genre.class.getSimpleName(), id)));
         if(title!= null) {
             genre.setTitle(title);
             try {
@@ -89,16 +89,16 @@ public class GenreJpaService implements GenreService
 
     @Override
     public void delete(long id, boolean withBook) throws Exception {
-        if(!getBooks(id).isEmpty() && !withBook)
-            throw new IllegalStateException(String.format(ASSOCIATED_ERROR_STRING, id));
+        if(getBooks(id).isEmpty() && !withBook)
+            throw new IllegalStateException(String.format(ASSOCIATED_ERROR_STRING, Genre.class.getSimpleName(), Book.class.getSimpleName()));
         else
             deleteWithBook(id);
     }
 
     @Override
     public void delete(long id) throws Exception {
-        if(!getBooks(id).isEmpty())
-            throw new IllegalStateException(String.format(ASSOCIATED_ERROR_STRING, id));
+        if(getBooks(id).isEmpty())
+            throw new IllegalStateException(String.format(ASSOCIATED_ERROR_STRING, Genre.class.getSimpleName(), Book.class.getSimpleName()));
         else
             deleteWithBook(id);
     }

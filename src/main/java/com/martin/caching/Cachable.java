@@ -11,4 +11,11 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Cachable {
     Class<? extends Storable> target();
+    Operation operation();
+    boolean disable() default false;
+
+    enum Operation{
+        ADD,
+        GET,
+    }
 }

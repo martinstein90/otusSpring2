@@ -6,6 +6,7 @@ import com.martin.domain.Book;
 import com.martin.domain.Genre;
 import org.assertj.core.util.Lists;
 import org.assertj.core.util.Sets;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,13 @@ public class GenreJpaRepositoryTest {
     @Autowired
     private BookRepository bookRepository;
 
+    @After
+    public void tearDown() throws Exception {
+        bookRepository.deleteAll();
+        authorRepository.deleteAll();
+        genreRepository.deleteAll();
+    }
+
     @Test
     public void checkInsertGenre() {
         Genre inserted = new Genre("horror");
@@ -37,7 +45,6 @@ public class GenreJpaRepositoryTest {
         Genre founded = genreRepository.findById(inserted.getId()).get();
         assertTrue(founded.equals(inserted));
 
-        genreRepository.deleteAll();
     }
 
     @Test
@@ -51,8 +58,6 @@ public class GenreJpaRepositoryTest {
         genreRepository.save(detective);
         long afterCount = genreRepository.count();
         assertEquals(afterCount-beforeCount, 3);
-
-        genreRepository.deleteAll();
     }
 
     @Test
@@ -68,8 +73,6 @@ public class GenreJpaRepositoryTest {
         assertTrue(set.contains(comedy) &&
                 set.contains(horror) &&
                 !set.contains(detective));
-
-        genreRepository.deleteAll();
     }
 
     @Test
@@ -96,9 +99,6 @@ public class GenreJpaRepositoryTest {
 
         assertTrue(set.contains(book1) && set.contains(book2) &&
                 set.contains(book3) && !set.contains(book4));
-
-        bookRepository.deleteAll();
-        genreRepository.deleteAll();
     }
 
     @Test
@@ -114,7 +114,6 @@ public class GenreJpaRepositoryTest {
 
         assertTrue(byId.getTitle().equals(title));
 
-        genreRepository.deleteAll();
     }
 
     @Test
@@ -129,8 +128,6 @@ public class GenreJpaRepositoryTest {
         List<Genre> all = Lists.newArrayList(genreRepository.findAll());
 
         assertTrue(!all.contains(horror) && all.contains(comedy) );
-
-        genreRepository.deleteAll();
     }
 
     @Test
@@ -174,8 +171,6 @@ public class GenreJpaRepositoryTest {
         Set<Book> setBooks = Sets.newHashSet(books);
         assertTrue(!setGenres.contains(genre1) && setGenres.contains(genre2) && setGenres.contains(genre3));
         assertTrue( !setBooks.contains(book1) && setBooks.contains(book2));
-
-        genreRepository.deleteAll();
     }
 
 }

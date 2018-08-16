@@ -10,13 +10,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
+import static com.martin.caching.Cachable.Operation.*;
 import static com.martin.service.Helper.*;
 
 @Service
-public class AuthorJpaService implements AuthorService
-{
+public class AuthorJpaService implements AuthorService {
 
     private final AuthorRepository authorRepository;
 
@@ -41,18 +40,17 @@ public class AuthorJpaService implements AuthorService
         return authorRepository.count();
     }
 
-    @Cachable(target = Author.class)
+    @Cachable(target = Author.class, operation = ADD, disable = true)
     @Override
     public List<Author> getAll(int page, int amountByOnePage) {
         return authorRepository.findAll(PageRequest.of(page,amountByOnePage)).getContent();
     }
 
+    @Cachable(target = Author.class, operation = GET, disable = true)
     @Override
-    public Author findById(long id) throws Exception {
-        Optional<Author> byId = authorRepository.findById(id);
-        if(!byId.isPresent())
-            throw new Exception(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Author.class.getSimpleName(), id));
-        return byId.get();
+    public Author findById(long id) {
+        return authorRepository.findById(id).orElseThrow(()->
+                new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Author.class.getSimpleName(), id)));
     }
 
     @Override
@@ -74,7 +72,8 @@ public class AuthorJpaService implements AuthorService
 
     @Override
     public Author update(long id, String firstname, String lastname) throws Exception {
-        Author author = authorRepository.findById(id).get();
+        Author author = authorRepository.findById(id).orElseThrow(()->
+                new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Author.class.getSimpleName(), id)));
         if(firstname!= null)
             author.setFirstname(firstname);
         if(lastname!=null)
@@ -90,8 +89,8 @@ public class AuthorJpaService implements AuthorService
 
     @Override
     public void delete(long id, boolean withBook) throws Exception {
-        if(!getBooks(id).isEmpty() && !withBook)
-            throw new IllegalStateException(String.format(ASSOCIATED_ERROR_STRING, id));
+        if(getBooks(id).isEmpty() && !withBook)
+            throw new IllegalStateException(String.format(ASSOCIATED_ERROR_STRING, Author.class.getSimpleName(), Book.class.getSimpleName()));
         else
             deleteWithBook(id);
     }
@@ -99,7 +98,7 @@ public class AuthorJpaService implements AuthorService
     @Override
     public void delete(long id) throws Exception {
         if(!getBooks(id).isEmpty())
-            throw new IllegalStateException(String.format(ASSOCIATED_ERROR_STRING, id));
+            throw new IllegalStateException(String.format(ASSOCIATED_ERROR_STRING, Author.class.getSimpleName(), Book.class.getSimpleName()));
         else
             deleteWithBook(id);
     }

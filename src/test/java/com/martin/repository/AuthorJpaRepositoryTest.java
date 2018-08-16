@@ -4,6 +4,7 @@ import com.martin.domain.Author;
 import com.martin.domain.Book;
 import com.martin.domain.Genre;
 import org.assertj.core.util.Sets;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +32,19 @@ public class AuthorJpaRepositoryTest {
     @Autowired
     private BookRepository bookRepository;
 
+    @After
+    public void tearDown() throws Exception {
+        bookRepository.deleteAll();
+        authorRepository.deleteAll();
+        genreRepository.deleteAll();
+    }
+
     @Test
     public void checkInsertAuthor() {
         Author inserted = new Author("Sergey", "Esenin");
         authorRepository.save(inserted);
-        Optional<Author> founded = authorRepository.findById(inserted.getId());
-        assertTrue(founded.get().equals(inserted));
-
-        authorRepository.deleteAll();
+        Author founded = authorRepository.findById(inserted.getId()).get();
+        assertTrue(founded.equals(inserted));
     }
 
     @Test
@@ -52,8 +58,6 @@ public class AuthorJpaRepositoryTest {
         authorRepository.save(tolstoy);
         long afterCount = authorRepository.count();
         assertEquals(afterCount-beforeCount, 3);
-
-        authorRepository.deleteAll();
     }
 
     @Test
@@ -64,14 +68,11 @@ public class AuthorJpaRepositoryTest {
         authorRepository.save(tolstoy);
         Author dostoevskiy = new Author("Fedor", "Dostoevskiy");
 
-
         Set<Author> set = Sets.newHashSet(authorRepository.findAll());
 
         assertTrue(set.contains(pushkin) &&
                 set.contains(tolstoy) &&
                 !set.contains(dostoevskiy));
-
-        authorRepository.deleteAll();
     }
 
     @Test
@@ -91,18 +92,11 @@ public class AuthorJpaRepositoryTest {
         bookRepository.save(book3);
         Book book4 = new Book("titl4", levashov, genre);
         bookRepository.save(book4);
-        Iterable<Book> books = authorRepository.getBooks(pushkin.getId());
-        for (Book b: books) {
-            System.out.println(b);
-        }
-        Set<Book> set = Sets.newHashSet(books);
+
+        Set<Book> set = Sets.newHashSet(authorRepository.getBooks(pushkin.getId()));
 
         assertTrue(set.contains(book1) && set.contains(book2) &&
                 set.contains(book3) && !set.contains(book4));
-
-        bookRepository.deleteAll();
-        authorRepository.deleteAll();
-        genreRepository.deleteAll();
     }
 
     @Test
@@ -116,28 +110,22 @@ public class AuthorJpaRepositoryTest {
 
         Author byId = authorRepository.findById(petrov.getId()).get();
         assertTrue(byId.getLastname().equals(newLastname));
-        authorRepository.deleteAll();
     }
 
     @Test
     public void checkDelete() {
         Author author1 = new Author("Alex", "Petrov");
         authorRepository.save(author1);
-
         Author author2 = new Author("Alex", "Sidorov");
         authorRepository.save(author2);
-
         Author author3 = new Author("Ivan", "Sidorov");
         authorRepository.save(author3);
 
         authorRepository.deleteById(author1.getId());
 
-        Iterable<Author> books = authorRepository.findAll();
-        Set<Author> all = Sets.newHashSet(books);
+        Set<Author> all = Sets.newHashSet(authorRepository.findAll());
 
         assertTrue(!all.contains(author1) && all.contains(author2) && all.contains(author3));
-
-        authorRepository.deleteAll();
     }
 
     @Test
@@ -161,7 +149,6 @@ public class AuthorJpaRepositoryTest {
 
         authorRepository.deleteById(author1.getId());
 
-        System.out.println("----------------------------");
         Iterable<Author> authors = authorRepository.findAll();
         for (Author author:authors) {
             System.out.println(author);
@@ -179,10 +166,6 @@ public class AuthorJpaRepositoryTest {
         Set<Book> setBooks = Sets.newHashSet(books);
         assertTrue(!setAuthors.contains(author1) && setAuthors.contains(author2) && setAuthors.contains(author3));
         assertTrue( !setBooks.contains(book1) && setBooks.contains(book2));
-
-        authorRepository.deleteAll();
-        genreRepository.deleteAll();
-        bookRepository.deleteAll();
     }
 
 
@@ -197,7 +180,6 @@ public class AuthorJpaRepositoryTest {
         Author byId = authorRepository.findById(author1.getId()).get();
         assertTrue(author1.equals(byId));
 
-        authorRepository.deleteAll();
     }
 
 }

@@ -55,6 +55,7 @@ public class BookJpaRepositoryTest {
     public void tearDown() {
         genreRepository.deleteAll();
         authorRepository.deleteAll();
+        commentRepository.deleteAll();
     }
 
     @Test
@@ -79,7 +80,6 @@ public class BookJpaRepositoryTest {
         long afterCount = bookRepository.count();
 
         assertEquals(afterCount-beforeCount, 3);
-
         bookRepository.deleteAll();
     }
 
@@ -121,6 +121,27 @@ public class BookJpaRepositoryTest {
     }
 
     @Test
+    public void checkFindByTitleLike()  {
+        Book book1 = new Book( "Asfffs", esenin, horror);
+        bookRepository.save(book1);
+        Book book2 = new Book( "Bfgfffs", pushkin, comedy);
+        bookRepository.save(book2);
+        Book book3 = new Book( "fffD", tolstoy, comedy);
+        bookRepository.save(book3);
+        Book book4 = new Book( "Rfff", tolstoy, comedy);
+        bookRepository.save(book4);
+        Book book5 = new Book( "Ggggg", tolstoy, comedy);
+        bookRepository.save(book5);
+        List<Book> books = Lists.newArrayList(bookRepository.findByTitleContaining("fff"));
+
+        for (Book book: books) {
+            System.out.println(book);
+        }
+        assertTrue(books.contains(book1) && books.contains(book2) &&
+                books.contains(book3) && books.contains(book4) && !books.contains(book5));
+    }
+
+    @Test
     public void checkDeleteBookWithComments() {
         Book book1 = new Book("Book1", pushkin, horror);
         bookRepository.save(book1);
@@ -142,7 +163,5 @@ public class BookJpaRepositoryTest {
 
         Set<Comment> setComments = Sets.newHashSet(comments);
         assertTrue(!setComments.contains(comment1) && !setComments.contains(comment2) && setComments.contains(comment3));
-
-        commentRepository.deleteAll();
     }
 }

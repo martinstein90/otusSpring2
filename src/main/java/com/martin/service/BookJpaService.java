@@ -35,7 +35,7 @@ public class BookJpaService implements BookService
     }
 
     @Override
-    public Book add(String title, int authorId, int genreId) throws Exception {
+    public Book add(String title, long authorId, long genreId) throws Exception {
         Book book = new Book(title, authorService.findById(authorId), genreService.findById(genreId));
         book = add(book);
         return book;
@@ -75,23 +75,20 @@ public class BookJpaService implements BookService
     public List<Book> findByTitle(String subTitle) throws Exception {
         List<Book> books = null;
         try {
-            books = Lists.newArrayList(bookRepository.findByTitleLike("%" + subTitle + "%" ));
+            books = Lists.newArrayList(bookRepository.findByTitleContaining(subTitle));
         }
         catch (DataIntegrityViolationException exception) {
             handlerException(exception, Book.class.getSimpleName());
         }
-
         return books;
     }
 
     @Override
     public Book findById(long id) throws Exception {
-        Optional<Book> byId = bookRepository.findById(id);
-        if(!byId.isPresent())
-            throw new Exception(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Book.class.getSimpleName(), id));
-        return byId.get();
+        Book byId = bookRepository.findById(id).orElseThrow(()->
+                new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Book.class.getSimpleName(), id)));
+        return byId;
     }
-
 
     @Override
     public List<Comment> getComments(long id) {
@@ -100,7 +97,8 @@ public class BookJpaService implements BookService
 
     @Override
     public Book update(long id, String title) throws Exception {
-        Book book = bookRepository.findById(id).get();
+        Book book = bookRepository.findById(id).orElseThrow(()->
+                new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Book.class.getSimpleName(), id)));
         if(title!= null)
             book.setTitle(title);
         try {
@@ -113,10 +111,15 @@ public class BookJpaService implements BookService
     }
 
     @Override
-    public Book update(long id, String bookTitle, int authorId, int genreId) throws Exception {
-        Book book = new Book(bookTitle, authorService.findById(authorId), genreService.findById(genreId));
+    public Book update(long id, String bookTitle, long authorId, long genreId) throws Exception {
+        Book book = bookRepository.findById(id).orElseThrow(()->
+                new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Book.class.getSimpleName(), id)));
         if(bookTitle!= null)
             book.setTitle(bookTitle);
+        if(authorId != 0)
+            book.setAuthor(authorService.findById(authorId));
+        if(genreId != 0)
+            book.setGenre(genreService.findById(genreId));
         try{
             bookRepository.save(book);
         }

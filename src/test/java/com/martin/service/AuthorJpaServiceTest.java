@@ -2,7 +2,11 @@ package com.martin.service;
 
 import com.martin.caching.Cache;
 import com.martin.domain.Author;
+import com.martin.domain.Book;
+import com.martin.domain.Genre;
 import com.martin.domain.Storable;
+import org.checkerframework.checker.units.qual.A;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
-import java.util.Map;
 
-import static com.jayway.jsonpath.spi.cache.CacheProvider.getCache;
-import static com.martin.service.Helper.DUPLICATE_ERROR_STRING;
-import static com.martin.service.Helper.EMPTY_RESULT_BY_ID_ERROR_STRING;
-import static com.martin.service.Helper.FORMAT_ERROR_STRING;
+import static com.martin.service.Helper.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -26,30 +26,52 @@ public class AuthorJpaServiceTest {
     @Autowired
     private AuthorService authorService;
 
+    @Autowired
+    private GenreService genreService;
+
+    @Autowired
+    private BookService bookService;
+
+    @After
+    public void tearDown() throws Exception {
+        bookService.deleteAll();
+        authorService.deleteAll();
+        genreService.deleteAll();
+    }
+
     @Test
     public void checkCacheAfterAddAuthor() throws Exception {
+//        Author aPetrov = authorService.add("Alex", "Petrov");
+//        Author iPetrov =authorService.add("Ivan", "Petrov");
+//        Author kPetrov =authorService.add("Kirill", "Petrov");
+//
+//        List<Author> all = authorService.getAll(0, 100);
+//        for (Author a: all) {
+//            System.out.println(a);
+//        }
+//        Map<Long, ? extends Storable> cache = Cache.getCache(Author.class);
+//        Author aPetrovCache = (Author) cache.get(aPetrov.getId());
+//        System.out.println("aPetrovCache = " + aPetrovCache);
+//        Author iPetrovCache = (Author)cache.get(iPetrov.getId());
+//        System.out.println("iPetrovCache = " + iPetrovCache);
+//        Author kPetrovCache = (Author)cache.get(kPetrov.getId());
+//        System.out.println("kPetrovCache = " + kPetrovCache);
+//
+//        assertEquals(aPetrov, aPetrovCache);
+//        assertEquals(iPetrov, iPetrovCache);
+//        assertEquals(kPetrov, kPetrovCache);
+//
+//        authorService.deleteAll();
+    }
 
-        Author aPetrov = authorService.add("Alex", "Petrov");
-        Author iPetrov =authorService.add("Ivan", "Petrov");
-        Author kPetrov =authorService.add("Kirill", "Petrov");
-
-        List<Author> all = authorService.getAll(0, 100);
-        for (Author a: all) {
-            System.out.println(a);
-        }
-        Map<Long, ? extends Storable> cache = Cache.getCache(Author.class);
-        Author aPetrovCache = (Author) cache.get(aPetrov.getId());
-        System.out.println("aPetrovCache = " + aPetrovCache);
-        Author iPetrovCache = (Author)cache.get(iPetrov.getId());
-        System.out.println("iPetrovCache = " + iPetrovCache);
-        Author kPetrovCache = (Author)cache.get(kPetrov.getId());
-        System.out.println("kPetrovCache = " + kPetrovCache);
-
-        assertEquals(aPetrov, aPetrovCache);
-        assertEquals(iPetrov, iPetrovCache);
-        assertEquals(kPetrov, kPetrovCache);
-
-        authorService.deleteAll();
+    @Test
+    public void checkCacheBeforeGetAuthorById() throws Exception {
+//        Author aPetrov = authorService.add("Alex", "Petrov");
+//        Author iPetrov =authorService.add("Ivan", "Petrov");
+//        Author kPetrov =authorService.add("Kirill", "Petrov");
+//
+//        Author byId = authorService.findById(aPetrov.getId());
+//        assertTrue(aPetrov.equals(byId));
     }
 
     @Test
@@ -68,7 +90,6 @@ public class AuthorJpaServiceTest {
             }
         }
         assertTrue(ok);
-        authorService.deleteAll();
     }
 
     @Test
@@ -85,9 +106,7 @@ public class AuthorJpaServiceTest {
                 ok = true;
             }
         }
-
         assertTrue(ok);
-        authorService.deleteAll();
     }
 
     @Test
@@ -98,7 +117,6 @@ public class AuthorJpaServiceTest {
         authorService.add("Kirill", "Petrov");
         long after = authorService.getCount();
         assertEquals(after-before, 3);
-        authorService.deleteAll();
     }
 
 
@@ -118,7 +136,6 @@ public class AuthorJpaServiceTest {
             }
         }
         assertTrue(ok);
-        authorService.deleteAll();
     }
 
     @Test
@@ -149,14 +166,25 @@ public class AuthorJpaServiceTest {
         }
 
         assertTrue(authors.contains(aPetrov) && authors.contains(aSidirov));
-        authorService.deleteAll();
     }
 
 
     @Test
-    public void deleteWithBook() throws Exception {
+    public void getExceptionAfterDeleteAuthorWithBook() throws Exception {
         Author aPetrov = authorService.add("Alex", "Petrov");
-        Author iDzuba = authorService.add("Ivan", "Dzuba");
-        authorService.deleteAll();
+        Genre horror = genreService.add("Horror");
+
+        bookService.add("title", aPetrov.getId(), horror.getId());
+
+        boolean ok = false;
+        try {
+            authorService.delete(aPetrov.getId());
+        }
+        catch (Exception exception) {
+            if(exception.getMessage().equals(String.format(ASSOCIATED_ERROR_STRING, Author.class.getSimpleName(), Book.class.getSimpleName()))) {
+                ok = true;
+            }
+        }
+        assertTrue(ok);
     }
 }
