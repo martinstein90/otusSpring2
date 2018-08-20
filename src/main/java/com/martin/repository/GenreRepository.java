@@ -2,13 +2,11 @@ package com.martin.repository;
 
 import com.martin.domain.Book;
 import com.martin.domain.Genre;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface GenreRepository extends PagingAndSortingRepository<Genre, Long> {
+public interface GenreRepository extends MongoRepository<Genre, String> {
 
-    @Query("select b from Book b left join b.genre g where g.id = ?1")
-    Iterable<Book> getBooks(long id);
+    //Iterable<Book> getBooks(long id);
 
     Iterable<Genre> findByTitle(String title);
 }

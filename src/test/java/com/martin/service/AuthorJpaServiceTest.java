@@ -1,11 +1,8 @@
 package com.martin.service;
 
-import com.martin.caching.Cache;
 import com.martin.domain.Author;
 import com.martin.domain.Book;
 import com.martin.domain.Genre;
-import com.martin.domain.Storable;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -125,7 +122,7 @@ public class AuthorJpaServiceTest {
         authorService.add("Alex", "Petrov");
         authorService.add("Ivan", "Petrov");
         authorService.add("Kirill", "Petrov");
-        int id = 1221;
+        String id = "1221";
         boolean ok = false;
         try {
             authorService.findById(id);

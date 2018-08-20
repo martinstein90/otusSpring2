@@ -1,23 +1,21 @@
 package com.martin.domain;
 
-import javax.persistence.*;
-import java.util.ArrayList;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import java.util.List;
 import java.util.Objects;
 
-@Entity
-@Table(name = "genres")
+@Document(collection="genres")
 public class Genre implements Storable{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private String id;
 
-    @Column(name = "title", length = 32)
+    @Field("title")
     private String title;
-
-    @OneToMany(mappedBy="genre", fetch=FetchType.LAZY)
-    private List<Book> books;
 
     public Genre() {
     }
@@ -26,7 +24,7 @@ public class Genre implements Storable{
         this.title = title;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
@@ -36,10 +34,6 @@ public class Genre implements Storable{
 
     public String getTitle() {
         return title;
-    }
-
-    public List<Book> getBooks() {
-        return books;
     }
 
     @Override

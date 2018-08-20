@@ -18,7 +18,7 @@ import static com.martin.service.Helper.EMPTY_RESULT_BY_ID_ERROR_STRING;
 import static com.martin.service.Helper.handlerException;
 
 @Service
-public class BookJpaService implements BookService
+public class BookVkService implements BookService
 {
 
     private final BookRepository bookRepository;
@@ -26,16 +26,16 @@ public class BookJpaService implements BookService
     private final GenreService genreService;
 
 
-    public BookJpaService(BookRepository bookRepository,
-                          AuthorService authorService,
-                          GenreService genreService) {
+    public BookVkService(BookRepository bookRepository,
+                         AuthorService authorService,
+                         GenreService genreService) {
         this.bookRepository = bookRepository;
         this.authorService = authorService;
         this.genreService = genreService;
     }
 
     @Override
-    public Book add(String title, long authorId, long genreId) throws Exception {
+    public Book add(String title, String authorId, String genreId) throws Exception {
         Book book = new Book(title, authorService.findById(authorId), genreService.findById(genreId));
         book = add(book);
         return book;
@@ -43,11 +43,12 @@ public class BookJpaService implements BookService
 
     @Override
     public Book add(String authorTitle, String authorFirsname, String authorLastname, String genreTitle) throws Exception {
-        Author addedAuthor = authorService.add(authorFirsname, authorLastname);
-        Genre addedGenre = genreService.add((genreTitle));
-        Book book = new Book(authorTitle, addedAuthor, addedGenre);
-        book = add(book);
-        return book;
+//        Author addedAuthor = authorService.add(authorFirsname, authorLastname);
+//        Genre addedGenre = genreService.add((genreTitle));
+//        Book book = new Book(authorTitle, addedAuthor, addedGenre);
+//        book = add(book);
+//        return book;
+        return null;
     }
 
     private Book add(Book book) throws Exception {
@@ -84,19 +85,20 @@ public class BookJpaService implements BookService
     }
 
     @Override
-    public Book findById(long id) throws Exception {
+    public Book findById(String id) throws Exception {
         Book byId = bookRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Book.class.getSimpleName(), id)));
         return byId;
     }
 
     @Override
-    public List<Comment> getComments(long id) {
-        return Lists.newArrayList(bookRepository.getComments(id));
+    public List<Comment> getComments(String id) {
+        //return Lists.newArrayList(bookRepository.getComments(id));
+        return null;
     }
 
     @Override
-    public Book update(long id, String title) throws Exception {
+    public Book update(String id, String title) throws Exception {
         Book book = bookRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Book.class.getSimpleName(), id)));
         if(title!= null)
@@ -111,26 +113,26 @@ public class BookJpaService implements BookService
     }
 
     @Override
-    public Book update(long id, String bookTitle, long authorId, long genreId) throws Exception {
+    public Book update(String id, String bookTitle, String authorId, String genreId) throws Exception {
         Book book = bookRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Book.class.getSimpleName(), id)));
-        if(bookTitle!= null)
-            book.setTitle(bookTitle);
-        if(authorId != 0)
-            book.setAuthor(authorService.findById(authorId));
-        if(genreId != 0)
-            book.setGenre(genreService.findById(genreId));
-        try{
-            bookRepository.save(book);
-        }
-        catch (DataIntegrityViolationException exception) {
-            handlerException(exception, Book.class.getSimpleName());
-        }
+//        if(bookTitle!= null)
+//            book.setTitle(bookTitle);
+//        if(authorId != 0)
+//            book.setAuthor(authorService.findById(authorId));
+//        if(genreId != 0)
+//            book.setGenre(genreService.findById(genreId));
+//        try{
+//            bookRepository.save(book);
+//        }
+//        catch (DataIntegrityViolationException exception) {
+//            handlerException(exception, Book.class.getSimpleName());
+//        }
         return book;
     }
 
     @Override
-    public void delete(long id) throws Exception {
+    public void delete(String id) throws Exception {
         try {
             bookRepository.deleteById(id);
         }

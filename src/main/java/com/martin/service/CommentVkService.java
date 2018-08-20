@@ -14,21 +14,21 @@ import java.util.Optional;
 import static com.martin.service.Helper.*;
 import static com.martin.service.Helper.handlerException;
 
-public class CommentJpaService implements CommentService
+public class CommentVkService implements CommentService
 {
 
     private final CommentRepository commentRepository;
     private final BookService bookService;
 
-    public CommentJpaService(CommentRepository commentRepository,
-                             BookService bookService) {
+    public CommentVkService(CommentRepository commentRepository,
+                            BookService bookService) {
         this.commentRepository = commentRepository;
         this.bookService = bookService;
     }
 
 
     @Override
-    public Comment add(String com, int bookId) throws Exception {
+    public Comment add(String com, String bookId) throws Exception {
         Comment comment = new Comment(com, bookService.findById(bookId));
         try{
             commentRepository.save(comment);
@@ -51,7 +51,7 @@ public class CommentJpaService implements CommentService
     }
 
     @Override
-    public Comment findById(long id) throws Exception {
+    public Comment findById(String id) throws Exception {
         Comment byId = commentRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Comment.class.getSimpleName(), id)));
         return byId;
@@ -70,12 +70,12 @@ public class CommentJpaService implements CommentService
     }
 
     @Override
-    public Comment update(long id, String comm, int bookId) throws Exception {
+    public Comment update(String id, String comm, String bookId) throws Exception {
         Comment comment = commentRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Comment.class.getSimpleName(), id)));;
         if(comm!= null)
             comment.setComment(comm);
-        if(bookId != 0)
+        if(bookId != null)
             comment.setBook(bookService.findById(bookId));
         try {
             commentRepository.save(comment);
@@ -87,7 +87,7 @@ public class CommentJpaService implements CommentService
     }
 
     @Override
-    public void delete(long id) throws Exception {
+    public void delete(String id) throws Exception {
         try {
             commentRepository.deleteById(id);
         }

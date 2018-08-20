@@ -15,17 +15,21 @@ import static com.martin.caching.Cachable.Operation.*;
 import static com.martin.service.Helper.*;
 
 @Service
-public class AuthorJpaService implements AuthorService {
+public class AuthorKvService implements AuthorService {
 
     private final AuthorRepository authorRepository;
 
-    public AuthorJpaService(AuthorRepository authorRepository) {
+    public AuthorKvService(AuthorRepository authorRepository) {
         this.authorRepository = authorRepository;
     }
 
     @Override
-    public Author add(String firsname, String lastname) throws Exception {
-        Author author = new Author(firsname, lastname);
+    public Author add(String firsname, String lastname, List<Book> books) throws Exception {
+        Author author;
+        if(books != null)
+            author = new Author(firsname, lastname, books);
+        else
+            author = new Author(firsname, lastname);
         try {
             authorRepository.save(author);
         }
@@ -33,6 +37,14 @@ public class AuthorJpaService implements AuthorService {
             handlerException(exception, author.toString()); //Todo вот такая обработка ошибки....
         }
         return author;
+    }
+
+
+    @Override
+    public void addBook(String id, List<Book> books) {
+        Author author = findById(id);
+        author.setBooks(books);
+        authorRepository.save(author);
     }
 
     @Override
@@ -48,7 +60,7 @@ public class AuthorJpaService implements AuthorService {
 
     @Cachable(target = Author.class, operation = GET, disable = true)
     @Override
-    public Author findById(long id) {
+    public Author findById(String id) {
         return authorRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Author.class.getSimpleName(), id)));
     }
@@ -66,12 +78,12 @@ public class AuthorJpaService implements AuthorService {
     }
 
     @Override
-    public List<Book> getBooks(long id){
+    public List<Book> getBooks(String id){
         return Lists.newArrayList(authorRepository.getBooks(id));
     }
 
     @Override
-    public Author update(long id, String firstname, String lastname) throws Exception {
+    public Author update(String id, String firstname, String lastname) throws Exception {
         Author author = authorRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Author.class.getSimpleName(), id)));
         if(firstname!= null)
@@ -88,7 +100,7 @@ public class AuthorJpaService implements AuthorService {
    }
 
     @Override
-    public void delete(long id, boolean withBook) throws Exception {
+    public void delete(String id, boolean withBook) throws Exception {
         if(getBooks(id).isEmpty() && !withBook)
             throw new IllegalStateException(String.format(ASSOCIATED_ERROR_STRING, Author.class.getSimpleName(), Book.class.getSimpleName()));
         else
@@ -96,14 +108,14 @@ public class AuthorJpaService implements AuthorService {
     }
 
     @Override
-    public void delete(long id) throws Exception {
+    public void delete(String id) throws Exception {
         if(!getBooks(id).isEmpty())
             throw new IllegalStateException(String.format(ASSOCIATED_ERROR_STRING, Author.class.getSimpleName(), Book.class.getSimpleName()));
         else
             deleteWithBook(id);
     }
 
-    private void deleteWithBook(long id) throws Exception {
+    private void deleteWithBook(String id) throws Exception {
         try {
             authorRepository.deleteById(id);
         }

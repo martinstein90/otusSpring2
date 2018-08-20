@@ -1,21 +1,23 @@
 package com.martin.domain;
 
-import javax.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+
 import java.util.Objects;
 
-@Entity
-@Table(name = "comments")
+@Document(collection="comments")
 public class Comment implements Storable{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private String id;
 
-    @Column(name = "comment", length = 100)
+    @Field("comment")
     private String comment;
 
-    @ManyToOne
-    @JoinColumn(name="book_id")
+    @DBRef
     private Book book;
 
     public Comment() {
@@ -48,7 +50,7 @@ public class Comment implements Storable{
     }
 
     @Override
-    public long getId() {
+    public String getId() {
         return id;
     }
 

@@ -1,38 +1,35 @@
 package com.martin.domain;
 
-import javax.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import java.util.List;
 import java.util.Objects;
 
-import static javax.persistence.CascadeType.ALL;
-
-@Entity
-@Table(name = "books")
+@Document(collection="books")
 public class Book implements Storable{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private String id;
 
-    @Column(name = "title", length = 32)
+    @Field("title")
     private String title;
 
-    @ManyToOne
-    @JoinColumn(name="author_id")
+    @DBRef
     private Author author;
 
-    @ManyToOne
-    @JoinColumn(name="genre_id")
+    @DBRef
     private Genre genre;
 
-    @OneToMany(mappedBy="book", fetch=FetchType.LAZY)
+    @Transient
     private List<Comment> comments;
 
     public Book() {
     }
 
-    public Book(String title, long authorId, Object genre) {
-    }
 
     public Book(String title, Author author, Genre genre) {
         this.title = title;
@@ -40,7 +37,7 @@ public class Book implements Storable{
         this.genre = genre;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
