@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.martin.service.Helper.ASSOCIATED_ERROR_STRING;
 import static com.martin.service.Helper.EMPTY_RESULT_BY_ID_ERROR_STRING;
 import static com.martin.service.Helper.handlerException;
 
@@ -66,12 +65,6 @@ public class GenreVkService implements GenreService {
     }
 
     @Override
-    public List<Book> getBooks(String id) {
-        //return Lists.newArrayList(genreRepository.getBooks(id));
-        return null;
-    }
-
-    @Override
     public Genre update(String id, String title) throws Exception {
         Genre genre = genreRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Genre.class.getSimpleName(), id)));
@@ -88,22 +81,7 @@ public class GenreVkService implements GenreService {
     }
 
     @Override
-    public void delete(String id, boolean withBook) throws Exception {
-        if(getBooks(id).isEmpty() && !withBook)
-            throw new IllegalStateException(String.format(ASSOCIATED_ERROR_STRING, Genre.class.getSimpleName(), Book.class.getSimpleName()));
-        else
-            deleteWithBook(id);
-    }
-
-    @Override
     public void delete(String id) throws Exception {
-        if(getBooks(id).isEmpty())
-            throw new IllegalStateException(String.format(ASSOCIATED_ERROR_STRING, Genre.class.getSimpleName(), Book.class.getSimpleName()));
-        else
-            deleteWithBook(id);
-    }
-
-    private void deleteWithBook(String id) throws Exception {
         try {
             genreRepository.deleteById(id);
         }

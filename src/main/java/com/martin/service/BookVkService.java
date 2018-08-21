@@ -18,20 +18,22 @@ import static com.martin.service.Helper.EMPTY_RESULT_BY_ID_ERROR_STRING;
 import static com.martin.service.Helper.handlerException;
 
 @Service
-public class BookVkService implements BookService
-{
+public class BookVkService implements BookService {
 
     private final BookRepository bookRepository;
     private final AuthorService authorService;
     private final GenreService genreService;
+    private final CommentService commentService;
 
 
     public BookVkService(BookRepository bookRepository,
                          AuthorService authorService,
-                         GenreService genreService) {
+                         GenreService genreService,
+                         CommentService commentService) {
         this.bookRepository = bookRepository;
         this.authorService = authorService;
         this.genreService = genreService;
+        this.commentService = commentService;
     }
 
     @Override
@@ -73,6 +75,13 @@ public class BookVkService implements BookService
     }
 
     @Override
+    public Book findById(String id) throws Exception {
+        Book byId = bookRepository.findById(id).orElseThrow(()->
+                new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Book.class.getSimpleName(), id)));
+        return byId;
+    }
+
+    @Override
     public List<Book> findByTitle(String subTitle) throws Exception {
         List<Book> books = null;
         try {
@@ -85,10 +94,19 @@ public class BookVkService implements BookService
     }
 
     @Override
-    public Book findById(String id) throws Exception {
-        Book byId = bookRepository.findById(id).orElseThrow(()->
-                new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Book.class.getSimpleName(), id)));
-        return byId;
+    public List<Book> findByAuthor(String authorId) throws Exception {
+        return Lists.newArrayList(bookRepository.findByAuthor(authorId));
+    }
+
+    @Override
+    public List<Book> findByGenre(String genreId) throws Exception {
+        return Lists.newArrayList(bookRepository.findByGenre(genreId));
+    }
+
+    @Override
+    public void addComments(String bookId, String commentId) throws Exception {
+        Comment commentById = commentService.findById(commentId);
+        bookRepository.addComment(bookId, commentById);
     }
 
     @Override

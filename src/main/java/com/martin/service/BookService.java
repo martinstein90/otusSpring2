@@ -12,7 +12,10 @@ public interface BookService {
     long getCount();
     List<Book> getAll(int page, int amountByOnePage);
     List<Book> findByTitle(String title) throws Exception;
+    List<Book> findByAuthor(String authorId) throws Exception;
+    List<Book> findByGenre(String genreId) throws Exception;
     Book findById(String id) throws Exception;
+    void addComments(String booktId, String commentId) throws Exception;
     List<Comment> getComments(String id);
     Book update(String id, String title) throws Exception;
     Book update(String id, String bookTitle, String authorId, String genreId) throws Exception;

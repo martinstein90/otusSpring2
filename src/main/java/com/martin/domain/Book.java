@@ -24,12 +24,11 @@ public class Book implements Storable{
     @DBRef
     private Genre genre;
 
-    @Transient
+    @DBRef
     private List<Comment> comments;
 
     public Book() {
     }
-
 
     public Book(String title, Author author, Genre genre) {
         this.title = title;
@@ -71,7 +70,7 @@ public class Book implements Storable{
 
     @Override
     public String toString() {
-        return "Книга (" + id + ") " + title + " " + author + " " + genre ;
+        return "Книга (" + id + ") " + title + " " + author + " " + genre + " "+ comments;
     }
 
     @Override

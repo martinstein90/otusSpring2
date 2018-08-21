@@ -12,9 +12,7 @@ public interface GenreService {
     List<Genre> getAll(int page, int amountByOnePage);
     Genre findById(String id) throws Exception;
     List<Genre> find(String title) throws Exception;
-    List<Book> getBooks(String id);
     Genre update(String id, String title) throws Exception;
     void delete(String id) throws Exception;
-    void delete(String id, boolean withBook) throws Exception;
     void deleteAll();
 }

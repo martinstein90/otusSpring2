@@ -24,12 +24,8 @@ public class AuthorKvService implements AuthorService {
     }
 
     @Override
-    public Author add(String firsname, String lastname, List<Book> books) throws Exception {
-        Author author;
-        if(books != null)
-            author = new Author(firsname, lastname, books);
-        else
-            author = new Author(firsname, lastname);
+    public Author add(String firsname, String lastname) throws Exception {
+        Author author = new Author(firsname, lastname);
         try {
             authorRepository.save(author);
         }
@@ -37,14 +33,6 @@ public class AuthorKvService implements AuthorService {
             handlerException(exception, author.toString()); //Todo вот такая обработка ошибки....
         }
         return author;
-    }
-
-
-    @Override
-    public void addBook(String id, List<Book> books) {
-        Author author = findById(id);
-        author.setBooks(books);
-        authorRepository.save(author);
     }
 
     @Override
@@ -78,11 +66,6 @@ public class AuthorKvService implements AuthorService {
     }
 
     @Override
-    public List<Book> getBooks(String id){
-        return Lists.newArrayList(authorRepository.getBooks(id));
-    }
-
-    @Override
     public Author update(String id, String firstname, String lastname) throws Exception {
         Author author = authorRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Author.class.getSimpleName(), id)));
@@ -99,23 +82,7 @@ public class AuthorKvService implements AuthorService {
         return author;
    }
 
-    @Override
-    public void delete(String id, boolean withBook) throws Exception {
-        if(getBooks(id).isEmpty() && !withBook)
-            throw new IllegalStateException(String.format(ASSOCIATED_ERROR_STRING, Author.class.getSimpleName(), Book.class.getSimpleName()));
-        else
-            deleteWithBook(id);
-    }
-
-    @Override
     public void delete(String id) throws Exception {
-        if(!getBooks(id).isEmpty())
-            throw new IllegalStateException(String.format(ASSOCIATED_ERROR_STRING, Author.class.getSimpleName(), Book.class.getSimpleName()));
-        else
-            deleteWithBook(id);
-    }
-
-    private void deleteWithBook(String id) throws Exception {
         try {
             authorRepository.deleteById(id);
         }

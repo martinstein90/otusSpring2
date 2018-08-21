@@ -7,6 +7,7 @@ import com.martin.domain.Genre;
 import com.martin.repository.CommentRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,22 +15,18 @@ import java.util.Optional;
 import static com.martin.service.Helper.*;
 import static com.martin.service.Helper.handlerException;
 
-public class CommentVkService implements CommentService
-{
+@Service
+public class CommentVkService implements CommentService {
 
     private final CommentRepository commentRepository;
-    private final BookService bookService;
 
-    public CommentVkService(CommentRepository commentRepository,
-                            BookService bookService) {
+    public CommentVkService(CommentRepository commentRepository) {
         this.commentRepository = commentRepository;
-        this.bookService = bookService;
     }
 
-
     @Override
-    public Comment add(String com, String bookId) throws Exception {
-        Comment comment = new Comment(com, bookService.findById(bookId));
+    public Comment add(String com) throws Exception {
+        Comment comment = new Comment(com);
         try{
             commentRepository.save(comment);
         }
@@ -42,7 +39,6 @@ public class CommentVkService implements CommentService
     @Override
     public long getCount() {
         return commentRepository.count();
-
     }
 
     @Override
@@ -70,13 +66,11 @@ public class CommentVkService implements CommentService
     }
 
     @Override
-    public Comment update(String id, String comm, String bookId) throws Exception {
+    public Comment update(String id, String comm) throws Exception {
         Comment comment = commentRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Comment.class.getSimpleName(), id)));;
         if(comm!= null)
             comment.setComment(comm);
-        if(bookId != null)
-            comment.setBook(bookService.findById(bookId));
         try {
             commentRepository.save(comment);
         }
