@@ -5,6 +5,8 @@ import com.martin.caching.Cachable;
 import com.martin.domain.Author;
 import com.martin.domain.Book;
 import com.martin.repository.AuthorRepository;
+import org.bson.types.ObjectId;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -29,7 +31,7 @@ public class AuthorKvService implements AuthorService {
         try {
             authorRepository.save(author);
         }
-        catch(DataIntegrityViolationException exception) {
+        catch(DataAccessException exception) {
             handlerException(exception, author.toString()); //Todo вот такая обработка ошибки....
         }
         return author;
@@ -48,7 +50,7 @@ public class AuthorKvService implements AuthorService {
 
     @Cachable(target = Author.class, operation = GET, disable = true)
     @Override
-    public Author findById(String id) {
+    public Author findById(ObjectId id) {
         return authorRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Author.class.getSimpleName(), id)));
     }
@@ -66,7 +68,7 @@ public class AuthorKvService implements AuthorService {
     }
 
     @Override
-    public Author update(String id, String firstname, String lastname) throws Exception {
+    public Author update(ObjectId id, String firstname, String lastname) throws Exception {
         Author author = authorRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Author.class.getSimpleName(), id)));
         if(firstname!= null)
@@ -82,7 +84,7 @@ public class AuthorKvService implements AuthorService {
         return author;
    }
 
-    public void delete(String id) throws Exception {
+    public void delete(ObjectId id) throws Exception {
         try {
             authorRepository.deleteById(id);
         }

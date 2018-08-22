@@ -1,6 +1,5 @@
 package com.martin;
 
-import com.google.common.collect.Lists;
 import com.martin.domain.Author;
 import com.martin.domain.Book;
 import com.martin.domain.Comment;
@@ -9,14 +8,13 @@ import com.martin.service.AuthorService;
 import com.martin.service.BookService;
 import com.martin.service.CommentService;
 import com.martin.service.GenreService;
+import org.bson.types.ObjectId;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
-import java.util.ArrayList;
 import java.util.List;
-
 
 @EnableAspectJAutoProxy
 @SpringBootApplication
@@ -31,35 +29,41 @@ public class Main {
         CommentService commentService= context.getBean(CommentService.class);
 
 
-        Author author1 = authorService.add("Martin", "Stein");
+        Author author1 = authorService.add("Martin1412", "Stein41");
         System.out.println(author1);
-        Author author2 = authorService.add("Alex", "Pushkin");
-        System.out.println(author1);
+        Author author2 = authorService.add("Alex121", "Pushkin1");
         System.out.println(author2);
-        Genre genre1 = genreService.add("horror");
+
+        Genre genre1 = genreService.add("horror11");
         System.out.println(genre1);
-        Genre genre2 = genreService.add("comedy");
+        Genre genre2 = genreService.add("comedy12");
         System.out.println(genre2);
 
-        Book book1 = bookService.add("book1", author1.getId(), genre1.getId());
+        Book book1 = bookService.add("book111", author1.getId(), genre1.getId());
         System.out.println(book1);
-        Book book2 = bookService.add("book2", author1.getId(), genre1.getId());
+        Book book2 = bookService.add("book211", author1.getId(), genre1.getId());
         System.out.println(book2);
-        Book book3 = bookService.add("book3", author1.getId(), genre1.getId());
+        Book book3 = bookService.add("book311", author1.getId(), genre1.getId());
         System.out.println(book3);
-        Book book4 = bookService.add("book4", author2.getId(), genre1.getId());
+        Book book4 = bookService.add("booaak411", author2.getId(), genre1.getId());
         System.out.println(book4);
-        Book book5 = bookService.add("book5", author2.getId(), genre2.getId());
+        Book book5 = bookService.add("dfaaff", author2.getId(), genre2.getId());
         System.out.println(book5);
 
-
+        System.out.println("ByAuthor");
         List<Book> booksByAuthor = bookService.findByAuthor(author1.getId());
         for (Book book: booksByAuthor) {
             System.out.println(book);
         }
 
+        System.out.println("ByGenre");
         List<Book> booksByGenre = bookService.findByGenre(genre1.getId());
         for (Book book: booksByGenre) {
+            System.out.println(book);
+        }
+        System.out.println("aa");
+        List<Book> aa = bookService.findByTitle("aa");
+        for (Book book: aa) {
             System.out.println(book);
         }
 
@@ -81,8 +85,8 @@ public class Main {
         }
 
 
-//        authorService.deleteAll();
-//        genreService.deleteAll();
-//        bookService.deleteAll();
+        authorService.deleteAll();
+        genreService.deleteAll();
+        bookService.deleteAll();
     }
 }

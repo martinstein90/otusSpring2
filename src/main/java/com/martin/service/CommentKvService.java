@@ -5,6 +5,7 @@ import com.martin.domain.Book;
 import com.martin.domain.Comment;
 import com.martin.domain.Genre;
 import com.martin.repository.CommentRepository;
+import org.bson.types.ObjectId;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -16,11 +17,11 @@ import static com.martin.service.Helper.*;
 import static com.martin.service.Helper.handlerException;
 
 @Service
-public class CommentVkService implements CommentService {
+public class CommentKvService implements CommentService {
 
     private final CommentRepository commentRepository;
 
-    public CommentVkService(CommentRepository commentRepository) {
+    public CommentKvService(CommentRepository commentRepository) {
         this.commentRepository = commentRepository;
     }
 
@@ -47,7 +48,7 @@ public class CommentVkService implements CommentService {
     }
 
     @Override
-    public Comment findById(String id) throws Exception {
+    public Comment findById(ObjectId id) throws Exception {
         Comment byId = commentRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Comment.class.getSimpleName(), id)));
         return byId;
@@ -66,7 +67,7 @@ public class CommentVkService implements CommentService {
     }
 
     @Override
-    public Comment update(String id, String comm) throws Exception {
+    public Comment update(ObjectId id, String comm) throws Exception {
         Comment comment = commentRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Comment.class.getSimpleName(), id)));;
         if(comm!= null)
@@ -81,7 +82,7 @@ public class CommentVkService implements CommentService {
     }
 
     @Override
-    public void delete(String id) throws Exception {
+    public void delete(ObjectId id) throws Exception {
         try {
             commentRepository.deleteById(id);
         }

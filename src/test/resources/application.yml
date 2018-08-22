@@ -1,10 +1,4 @@
-spring:
-  shell:
-    interactive:
-      enabled: false
-  datasource:
-    initialization-mode: always
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: none
+#spring:
+#  data:
+#    mongodb:
+#      port: 0

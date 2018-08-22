@@ -1,5 +1,7 @@
 package com.martin.service;
 
+import org.springframework.dao.DuplicateKeyException;
+
 public class Helper {
     private Helper() {
     }
@@ -11,12 +13,12 @@ public class Helper {
     static final String ASSOCIATED_ERROR_STRING = "Объект %s не удалить при ссылающего на него %s объектов";
 
     static void handlerException(Exception exception, String object) throws Exception {
-        String message = exception.getCause().getCause().getMessage();
-
-        if(message.contains("Нарушение уникального индекса или первичного ключа"))
+        System.out.println(exception.getClass().getName());
+        System.out.println(exception.getMessage());
+        if(exception instanceof DuplicateKeyException)
             throw new Exception(String.format(DUPLICATE_ERROR_STRING, object));
-        else if(message.contains("Значение слишком длинное для поля"))
-            throw new Exception(String.format(FORMAT_ERROR_STRING, object)); //Todo Какие еще можно ситуации добавить?
+//        else if(message.contains("Значение слишком длинное для поля"))  //Todo наверное, такое в монге не реализовать. Размер ничем не ограничен...
+//            throw new Exception(String.format(FORMAT_ERROR_STRING, object));
         else
             throw new Exception(String.format(ERROR_STRING, object));
     }

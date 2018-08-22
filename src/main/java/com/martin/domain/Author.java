@@ -1,22 +1,33 @@
 package com.martin.domain;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.*;
 
+import static com.martin.domain.Author.COLLECTION_TITLE;
 
-@Document(collection="authors")
+@CompoundIndexes({
+        @CompoundIndex(unique = true, name = "unicNamesAuthor", def="{'Firstname' : 1, 'Lastname': 1}")
+})
+@Document(collection=COLLECTION_TITLE)
 public class Author implements Storable{
 
-    @Id
-    private String id;
+    public static final String COLLECTION_TITLE = "authors";
+    public static final String FIELD_FIRSTNAME = "Firstname";
+    public static final String FIELD_LASTNAME = "Lastname";
 
-    @Field("Firstname")
+    @Id
+    private ObjectId id;
+
+    @Field(value = FIELD_FIRSTNAME)
     private String firstname;
 
-    @Field("Lastname")
+    @Field(value = FIELD_LASTNAME)
     private String lastname;
 
     public Author() {
@@ -28,7 +39,7 @@ public class Author implements Storable{
     }
 
     @Override
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 

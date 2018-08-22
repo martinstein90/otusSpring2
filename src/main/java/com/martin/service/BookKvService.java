@@ -6,6 +6,7 @@ import com.martin.domain.Book;
 import com.martin.domain.Comment;
 import com.martin.domain.Genre;
 import com.martin.repository.BookRepository;
+import org.bson.types.ObjectId;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import static com.martin.service.Helper.EMPTY_RESULT_BY_ID_ERROR_STRING;
 import static com.martin.service.Helper.handlerException;
 
 @Service
-public class BookVkService implements BookService {
+public class BookKvService implements BookService {
 
     private final BookRepository bookRepository;
     private final AuthorService authorService;
@@ -26,7 +27,7 @@ public class BookVkService implements BookService {
     private final CommentService commentService;
 
 
-    public BookVkService(BookRepository bookRepository,
+    public BookKvService(BookRepository bookRepository,
                          AuthorService authorService,
                          GenreService genreService,
                          CommentService commentService) {
@@ -37,7 +38,7 @@ public class BookVkService implements BookService {
     }
 
     @Override
-    public Book add(String title, String authorId, String genreId) throws Exception {
+    public Book add(String title, ObjectId authorId, ObjectId genreId) throws Exception {
         Book book = new Book(title, authorService.findById(authorId), genreService.findById(genreId));
         book = add(book);
         return book;
@@ -45,12 +46,11 @@ public class BookVkService implements BookService {
 
     @Override
     public Book add(String authorTitle, String authorFirsname, String authorLastname, String genreTitle) throws Exception {
-//        Author addedAuthor = authorService.add(authorFirsname, authorLastname);
-//        Genre addedGenre = genreService.add((genreTitle));
-//        Book book = new Book(authorTitle, addedAuthor, addedGenre);
-//        book = add(book);
-//        return book;
-        return null;
+        Author addedAuthor = authorService.add(authorFirsname, authorLastname);
+        Genre addedGenre = genreService.add(genreTitle);
+        Book book = new Book(authorTitle, addedAuthor, addedGenre);
+        book = add(book);
+        return book;
     }
 
     private Book add(Book book) throws Exception {
@@ -75,7 +75,7 @@ public class BookVkService implements BookService {
     }
 
     @Override
-    public Book findById(String id) throws Exception {
+    public Book findById(ObjectId id) throws Exception {
         Book byId = bookRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Book.class.getSimpleName(), id)));
         return byId;
@@ -94,29 +94,29 @@ public class BookVkService implements BookService {
     }
 
     @Override
-    public List<Book> findByAuthor(String authorId) throws Exception {
+    public List<Book> findByAuthor(ObjectId authorId) throws Exception {
         return Lists.newArrayList(bookRepository.findByAuthor(authorId));
     }
 
     @Override
-    public List<Book> findByGenre(String genreId) throws Exception {
+    public List<Book> findByGenre(ObjectId genreId) throws Exception {
         return Lists.newArrayList(bookRepository.findByGenre(genreId));
     }
 
     @Override
-    public void addComments(String bookId, String commentId) throws Exception {
+    public void addComments(ObjectId bookId, ObjectId commentId) throws Exception {
         Comment commentById = commentService.findById(commentId);
         bookRepository.addComment(bookId, commentById);
     }
 
     @Override
-    public List<Comment> getComments(String id) {
-        //return Lists.newArrayList(bookRepository.getComments(id));
-        return null;
+    public List<Comment> getComments(ObjectId id) throws Exception {
+        Book byId = findById(id);
+        return byId.getComments();
     }
 
     @Override
-    public Book update(String id, String title) throws Exception {
+    public Book update(ObjectId id, String title) throws Exception {
         Book book = bookRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Book.class.getSimpleName(), id)));
         if(title!= null)
@@ -131,26 +131,26 @@ public class BookVkService implements BookService {
     }
 
     @Override
-    public Book update(String id, String bookTitle, String authorId, String genreId) throws Exception {
+    public Book update(ObjectId id, String bookTitle, ObjectId authorId, ObjectId genreId) throws Exception {
         Book book = bookRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Book.class.getSimpleName(), id)));
-//        if(bookTitle!= null)
-//            book.setTitle(bookTitle);
-//        if(authorId != 0)
-//            book.setAuthor(authorService.findById(authorId));
-//        if(genreId != 0)
-//            book.setGenre(genreService.findById(genreId));
-//        try{
-//            bookRepository.save(book);
-//        }
-//        catch (DataIntegrityViolationException exception) {
-//            handlerException(exception, Book.class.getSimpleName());
-//        }
+        if(bookTitle!= null)
+            book.setTitle(bookTitle);
+        if(authorId != null)
+            book.setAuthor(authorService.findById(authorId));
+        if(genreId != null)
+            book.setGenre(genreService.findById(genreId));
+        try{
+            bookRepository.save(book);
+        }
+        catch (DataIntegrityViolationException exception) {
+            handlerException(exception, Book.class.getSimpleName());
+        }
         return book;
     }
 
     @Override
-    public void delete(String id) throws Exception {
+    public void delete(ObjectId id) throws Exception {
         try {
             bookRepository.deleteById(id);
         }

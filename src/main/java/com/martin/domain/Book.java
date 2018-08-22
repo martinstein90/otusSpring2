@@ -1,31 +1,50 @@
 package com.martin.domain;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Document(collection="books")
+import static com.martin.domain.Book.COLLECTION_TITLE;
+import static com.martin.domain.Book.FIELD_TITLE;
+
+@CompoundIndexes({
+        @CompoundIndex(unique = true, name = "unicTitleBook", def="{'"+ FIELD_TITLE + "' : 1}")
+})
+@Document(collection = COLLECTION_TITLE)
 public class Book implements Storable{
 
-    @Id
-    private String id;
+    public static final String COLLECTION_TITLE = "books";
+    public static final String FIELD_TITLE = "title";
+    public static final String FIELD_AUTHOR = "author";
+    public static final String FIELD_GENRE = "genre";
+    public static final String FIELD_COMMENTS = "comments";
 
-    @Field("title")
+    @Id
+    private ObjectId id;
+
+    @Field(FIELD_TITLE)
     private String title;
 
+    @Field(FIELD_AUTHOR)
     @DBRef
     private Author author;
 
+    @Field(FIELD_GENRE)
     @DBRef
     private Genre genre;
 
+    @Field(FIELD_COMMENTS)
     @DBRef
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
     public Book() {
     }
@@ -36,7 +55,7 @@ public class Book implements Storable{
         this.genre = genre;
     }
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 

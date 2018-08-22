@@ -1,5 +1,6 @@
 package com.martin.domain;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -8,13 +9,18 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.util.List;
 import java.util.Objects;
 
-@Document(collection="genres")
+import static com.martin.domain.Genre.COLLECTION_TITLE;
+
+@Document(collection=COLLECTION_TITLE)
 public class Genre implements Storable{
 
-    @Id
-    private String id;
+    public static final String COLLECTION_TITLE = "genres";
+    public static final String FIELD_TITLE = "title";
 
-    @Field("title")
+    @Id
+    private ObjectId id;
+
+    @Field(FIELD_TITLE)
     private String title;
 
     public Genre() {
@@ -24,7 +30,7 @@ public class Genre implements Storable{
         this.title = title;
     }
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 

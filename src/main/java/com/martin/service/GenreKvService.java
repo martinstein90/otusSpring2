@@ -5,6 +5,7 @@ import com.martin.domain.Author;
 import com.martin.domain.Book;
 import com.martin.domain.Genre;
 import com.martin.repository.GenreRepository;
+import org.bson.types.ObjectId;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -15,11 +16,11 @@ import static com.martin.service.Helper.EMPTY_RESULT_BY_ID_ERROR_STRING;
 import static com.martin.service.Helper.handlerException;
 
 @Service
-public class GenreVkService implements GenreService {
+public class GenreKvService implements GenreService {
 
     private final GenreRepository genreRepository;
 
-    public GenreVkService(GenreRepository genreRepository) {
+    public GenreKvService(GenreRepository genreRepository) {
         this.genreRepository = genreRepository;
     }
 
@@ -46,7 +47,7 @@ public class GenreVkService implements GenreService {
     }
 
     @Override
-    public Genre findById(String id) throws Exception {
+    public Genre findById(ObjectId id) throws Exception {
         Genre byId = genreRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Genre.class.getSimpleName(), id)));
            return byId;
@@ -65,7 +66,7 @@ public class GenreVkService implements GenreService {
     }
 
     @Override
-    public Genre update(String id, String title) throws Exception {
+    public Genre update(ObjectId id, String title) throws Exception {
         Genre genre = genreRepository.findById(id).orElseThrow(()->
                 new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Genre.class.getSimpleName(), id)));
         if(title!= null) {
@@ -81,7 +82,7 @@ public class GenreVkService implements GenreService {
     }
 
     @Override
-    public void delete(String id) throws Exception {
+    public void delete(ObjectId id) throws Exception {
         try {
             genreRepository.deleteById(id);
         }

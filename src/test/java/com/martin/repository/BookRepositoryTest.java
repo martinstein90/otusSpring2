@@ -12,8 +12,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.xml.bind.SchemaOutputResolver;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,8 +24,9 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest
-public class BookJpaRepositoryTest {
+public class BookRepositoryTest {
 
     @Autowired
     private AuthorRepository authorRepository;
@@ -51,21 +54,12 @@ public class BookJpaRepositoryTest {
         authorRepository.save(tolstoy);
     }
 
-    @After
-    public void tearDown() {
-        genreRepository.deleteAll();
-        authorRepository.deleteAll();
-        commentRepository.deleteAll();
-    }
-
     @Test
     public void checkInsertBook() {
         Book book = new Book( "Book1", pushkin, horror);
         bookRepository.save(book);
         Book founded = bookRepository.findById(book.getId()).get();
         assertTrue(founded.equals(founded));
-
-        bookRepository.deleteAll();
     }
 
     @Test
@@ -80,7 +74,41 @@ public class BookJpaRepositoryTest {
         long afterCount = bookRepository.count();
 
         assertEquals(afterCount-beforeCount, 3);
-        bookRepository.deleteAll();
+    }
+
+    @Test
+    public void checkGetBooksByAuthor(){
+        Book book1 = new Book("titl1", pushkin, horror);
+        bookRepository.save(book1);
+        Book book2 = new Book("titl2", pushkin, horror);
+        bookRepository.save(book2);
+        Book book3 = new Book("titl3", pushkin, horror);
+        bookRepository.save(book3);
+        Book book4 = new Book("titl4", esenin, horror);
+        bookRepository.save(book4);
+
+        Set<Book> set = Sets.newHashSet(bookRepository.findByAuthor(pushkin.getId()));
+
+        assertTrue(set.contains(book1) && set.contains(book2) &&
+                set.contains(book3) && !set.contains(book4));
+    }
+
+    @Test
+    public void checkGetBooksByGenre(){
+
+        Book book1 = new Book("titl1", pushkin, horror);
+        bookRepository.save(book1);
+        Book book2 = new Book("titl2", pushkin, horror);
+        bookRepository.save(book2);
+        Book book3 = new Book("titl3", esenin, horror);
+        bookRepository.save(book3);
+        Book book4 = new Book("titl4", esenin, comedy);
+        bookRepository.save(book4);
+
+        Set<Book> set = Sets.newHashSet(bookRepository.findByGenre(horror.getId()));
+
+        assertTrue(set.contains(book1) && set.contains(book2) &&
+                set.contains(book3) && !set.contains(book4));
     }
 
     @Test
@@ -101,27 +129,24 @@ public class BookJpaRepositoryTest {
 
     @Test
     public void checkGetComment() {
- /*       Book book = new Book("Book1", pushkin, horror);
+        Book book = new Book("Book1", pushkin, horror);
         bookRepository.save(book);
-        Comment comment1 = new Comment("Comment1", book);
+        Comment comment1 = new Comment("Comment1");
         commentRepository.save(comment1);
-        Comment comment2 = new Comment("Comment2", book);
+        bookRepository.addComment(book.getId(), comment1);
+        Comment comment2 = new Comment("Comment2");
         commentRepository.save(comment2);
+        bookRepository.addComment(book.getId(), comment2);
 
-        Iterable<Comment> comments = bookRepository.getComments(book.getId());
-        for (Comment comment: comments) {
-            System.out.println(comment);
-        }
+        Book newBook = bookRepository.findById(book.getId()).get();
 
-        Set<Comment> setComments = Sets.newHashSet(comments);
+        List<Comment> comments = newBook.getComments();
 
-        assertTrue(setComments.contains(comment1) && setComments.contains(comment2));
-        commentRepository.deleteAll();
-        bookRepository.deleteAll();*/
+        assertTrue(comments.contains(comment1) && comments.contains(comment2));
     }
 
     @Test
-    public void checkFindByTitleLike()  {/*
+    public void checkFindByTitleLike()  {
         Book book1 = new Book( "Asfffs", esenin, horror);
         bookRepository.save(book1);
         Book book2 = new Book( "Bfgfffs", pushkin, comedy);
@@ -134,34 +159,23 @@ public class BookJpaRepositoryTest {
         bookRepository.save(book5);
         List<Book> books = Lists.newArrayList(bookRepository.findByTitleContaining("fff"));
 
-        for (Book book: books) {
-            System.out.println(book);
-        }
         assertTrue(books.contains(book1) && books.contains(book2) &&
-                books.contains(book3) && books.contains(book4) && !books.contains(book5));*/
+                books.contains(book3) && books.contains(book4) && !books.contains(book5));
     }
 
     @Test
-    public void checkDeleteBookWithComments() {/*
+    public void checkDelete() {
         Book book1 = new Book("Book1", pushkin, horror);
         bookRepository.save(book1);
         Book book2 = new Book("Book2", tolstoy, comedy);
         bookRepository.save(book2);
-        Comment comment1 = new Comment("Comment1", book1);
-        commentRepository.save(comment1);
-        Comment comment2 = new Comment("Comment2", book1);
-        commentRepository.save(comment2);
-        Comment comment3 = new Comment("Comment3", book2);
-        commentRepository.save(comment3);
+        Book book3 = new Book("Book3", tolstoy, comedy);
+        bookRepository.save(book3);
 
         bookRepository.deleteById(book1.getId());
 
-        Iterable<Comment> comments = commentRepository.findAll();
-        for (Comment comment: comments) {
-            System.out.println(comment);
-        }
 
-        Set<Comment> setComments = Sets.newHashSet(comments);
-        assertTrue(!setComments.contains(comment1) && !setComments.contains(comment2) && setComments.contains(comment3));*/
+        Set<Book> books = Sets.newHashSet(bookRepository.findAll());
+        assertTrue(!books.contains(book1) && books.contains(book2) && books.contains(book3));
     }
 }

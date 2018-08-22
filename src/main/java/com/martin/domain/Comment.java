@@ -1,17 +1,25 @@
 package com.martin.domain;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.Objects;
 
-@Document(collection="comments")
+import static com.martin.domain.Comment.COLLECTION_TITLE;
+
+
+@Document(collection=COLLECTION_TITLE)
 public class Comment implements Storable {
 
-    @Id
-    private String id;
+    public static final String COLLECTION_TITLE = "comments";
+    public static final String FIELD_COMMENT = "comment";
 
-    @Field("comment")
+    @Id
+    private ObjectId id;
+
+    @Field(FIELD_COMMENT)
     private String comment;
 
     public Comment() {
@@ -22,7 +30,7 @@ public class Comment implements Storable {
     }
 
     @Override
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
@@ -39,4 +47,17 @@ public class Comment implements Storable {
         return "Комментарий (" + id + ") " + comment;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Comment comment1 = (Comment) o;
+        return Objects.equals(id, comment1.id) &&
+                Objects.equals(comment, comment1.comment);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, comment);
+    }
 }
