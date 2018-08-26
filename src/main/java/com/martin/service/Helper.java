@@ -21,5 +21,6 @@ public class Helper {
 //            throw new Exception(String.format(FORMAT_ERROR_STRING, object));
         else
             throw new Exception(String.format(ERROR_STRING, object));
+
     }
 }
