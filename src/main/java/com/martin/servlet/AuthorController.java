@@ -11,7 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 public class AuthorController {
@@ -23,51 +22,53 @@ public class AuthorController {
         this.authorService = authorService;
     }
 
-
-    @GetMapping("/")
-    public String start(Model model) {
-        System.out.println("start");
-        model.addAttribute("name", "Alex");
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public String index() {
         return "index";
     }
 
-    @GetMapping("/authors")
+    @RequestMapping(value = "/authors", method = RequestMethod.GET)
     public String getAll(Model model) {
-        System.out.println("getAll");
-        List<AuthorDto> authors = authorService.getAll(0, 10).stream()
-                .map(AuthorDto::toDataTransferObject)
-                .collect(Collectors.toList());
-        model.addAttribute("authors", authors);
-        model.addAttribute("name", "Alex");
-
-        return "list";
+        List<Author> authors = authorService.getAll(0, Integer.MAX_VALUE); //Todo Конечно Integer.MAX_VALUE - некрасиво так делать,
+        model.addAttribute("authors", authors);                     // но реализовывать вкладки по 10 авторов времени нет.
+        return "list";                                                           //Хотя getAll с pages задумывалась как раз для этого
     }
 
-    @RequestMapping(value = "/authors/", method = RequestMethod.GET)
-    @ResponseBody public AuthorDto create(AuthorDto authorDto) throws Exception {
-        Author author = AuthorDto.toDomainObject(authorDto);
-        Author authorAdd = authorService.add(author.getFirstname(), author.getLastname());
-        return AuthorDto.toDataTransferObject(authorAdd);
+    @RequestMapping(value = "/authors/add", method = RequestMethod.GET)
+    public String add(Model model) {
+        model.addAttribute("action", "insert");
+        return "edit";
     }
 
+    @RequestMapping(value = "/authors/edit", method = RequestMethod.GET)
+    public String edit(@RequestParam(value="id") String id,
+                       Model model) throws Exception {
+        Author finded = authorService.findById(new ObjectId(id));
+        model.addAttribute("action", "save");
+        model.addAttribute("author", finded);
+        return "edit";
+    }
 
-    @RequestMapping(value = "/authors/{id}", method = RequestMethod.GET)
-    @ResponseBody public AuthorDto get(@PathVariable("id") String id) throws Exception {
+    @RequestMapping(value = "/authors/insert", method = RequestMethod.POST)
+    public String insert(@RequestParam(value="firstname") String firstname,
+                         @RequestParam(value="lastname") String lastname,
+                         Model model) throws Exception {
+        Author added = authorService.add(firstname, lastname);
+        model.addAttribute("author", added);
+        model.addAttribute("action", "insert");
+        return "edited";
+    }
+
+    @RequestMapping(value= "/authors/save", method = RequestMethod.POST)
+    public String save(@RequestParam("id") String id,
+                       @RequestParam("firstname") String firstname,
+                       @RequestParam("lastname") String lastname,
+                       Model model) throws Exception {
         Author author = authorService.findById(new ObjectId(id));
-        System.out.println("author = " + author);
-        return AuthorDto.toDataTransferObject(author);
-    }
-
-
-    @PutMapping("/authors/{id}/holder")
-    @ResponseBody public void change(@PathVariable("id") String id, @RequestParam("firstname") String firstname, @RequestParam("lastname") String lastname) throws Exception {
-        Author author = authorService.findById(new ObjectId(id));
-        authorService.update(author.getId(), firstname, lastname);
-    }
-
-    @DeleteMapping("/authors/{id}")
-    public void delete(@PathVariable("id") String id) throws Exception {
-        authorService.delete(new ObjectId(id));
+        Author updated = authorService.update(author.getId(), firstname, lastname);
+        model.addAttribute("author", updated);
+        model.addAttribute("action", "save");
+        return "edited";
     }
 
     @ExceptionHandler(Exception.class)
@@ -75,5 +76,4 @@ public class AuthorController {
         System.out.println("handleException " + ex.getMessage());
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
-
 }
