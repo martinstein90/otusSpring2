@@ -8,7 +8,6 @@ public class AuthorDto {
     private String firstname;
     private String lastname;
 
-
     public AuthorDto(String id, String firstname, String lastname) {
         this.id = id;
         this.firstname = firstname;
@@ -31,6 +30,14 @@ public class AuthorDto {
         this.lastname = lastname;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public static Author toDomainObject(AuthorDto dto) {
         return new Author(dto.getFirstname(), dto.getLastname());
     }
@@ -39,4 +46,12 @@ public class AuthorDto {
         return new AuthorDto(author.getId().toString(), author.getFirstname(), author.getLastname());
     }
 
+    @Override
+    public String toString() {
+        return "AuthorDto{" +
+                "id='" + id + '\'' +
+                ", firstname='" + firstname + '\'' +
+                ", lastname='" + lastname + '\'' +
+                '}';
+    }
 }
