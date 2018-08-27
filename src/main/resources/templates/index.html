@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Библиотка</title>
 </head>
 <body>
-    <h1>Моя супер онлайн библиотека</h1>
-    <h2>Пока только для <a href= "/authors">авторов</a></h2>
+    <h1 th:text="#{localized.myLibrary}">Моя супер либрари</h1>
+    <h2 th:text="#{localized.whileOnlyFor}">Пока только для</h2>
+    <h2><a th:text="#{localized.forAuthors}" href= "/authors">авторов</a></h2>
+
 </body>
 </html>
