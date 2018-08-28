@@ -33,17 +33,12 @@ public class Main {
 
     @PostConstruct
     public void init() throws Exception {
-//        Author author1 = service.add("Martin1", "Stein");
-//        System.out.println(author1);
-//        Author author2 = service.add("Alex", "Pushkin");
-//        System.out.println(author2);
-//        Author author3 = service.add("Fedor", "Dostoevsky");
-//        System.out.println(author3);
-//        Author author4 = service.add("Anton", "Chechov");
-//        System.out.println(author3);
-//        Author author5 = service.add("Sergey", "Esenin");
-//        System.out.println(author3);
-//        Author author6 = service.add("Nilolay", "Levashov");
-//        System.out.println(author3);
+        service.deleteAll();
+        service.add("Martin1", "Stein");
+        service.add("Alex", "Pushkin");
+        service.add("Fedor", "Dostoevsky");
+        service.add("Anton", "Chechov");
+        service.add("Sergey", "Esenin");
+        service.add("Nilolay", "Levashov");
     }
 }
