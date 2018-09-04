@@ -6,6 +6,8 @@ import com.martin.domain.Author;
 import com.martin.domain.Book;
 import com.martin.repository.AuthorRepository;
 import org.bson.types.ObjectId;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +19,7 @@ import static com.martin.caching.Cachable.Operation.*;
 import static com.martin.service.Helper.*;
 
 @Service
+@Scope(value = "singleton")
 public class AuthorKvService implements AuthorService {
 
     private final AuthorRepository authorRepository;
