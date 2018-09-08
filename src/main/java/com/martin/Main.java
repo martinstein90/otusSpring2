@@ -34,7 +34,7 @@ public class Main {
     @PostConstruct
     public void init() throws Exception {
         service.deleteAll();
-        service.add("Martin1", "Stein");
+        service.add("Martin", "Stein");
         service.add("Alex", "Pushkin");
         service.add("Fedor", "Dostoevsky");
         service.add("Anton", "Chechov");
