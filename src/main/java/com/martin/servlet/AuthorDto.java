@@ -47,7 +47,7 @@ public class AuthorDto {
     }
 
     public static AuthorDto toDataTransferObject(Author dao) {
-        return new AuthorDto(dao.getId().toString(), dao.getFirstname(), dao.getLastname());
+        return new AuthorDto(dao.getId()!=null ? dao.getId().toString() : "0", dao.getFirstname(), dao.getLastname());
     }
 
     @Override

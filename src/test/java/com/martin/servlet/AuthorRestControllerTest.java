@@ -1,5 +1,6 @@
 package com.martin.servlet;
 
+
 import com.martin.domain.Author;
 import com.martin.service.AuthorService;
 import org.bson.types.ObjectId;
@@ -9,30 +10,28 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
-import java.util.Locale;
 
 import static javax.servlet.http.HttpServletResponse.SC_ACCEPTED;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(AuthorController.class)
+@WebMvcTest(AuthorRestController.class)
 @ContextConfiguration
-public class AuthorControllerTest {
+public class AuthorRestControllerTest {
 
     @Autowired
     private MockMvc mvc;
@@ -64,37 +63,37 @@ public class AuthorControllerTest {
 
     @Test
     public void insertTest() throws Exception {
-        this.mvc.perform(post("/authors/insert")
-                            .param("firstname", "Alex")
-                            .param("lastname", "Pushkin"))
-                                .andExpect(status().is(SC_CREATED))
-                                .andExpect(content().string(containsString("Alex Pushkin добавлен")));
+        String firstname = "Alex";
+        String lastname = "Pushkin";
+        mvc.perform(post("/authors/insert")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"firstname\" : \"" + firstname + "\" , \"lastname\" : \"" + lastname + "\" }"))
+                    .andExpect(status().is(SC_CREATED))
+                    .andExpect(jsonPath("$.firstname").value(firstname))
+                    .andExpect(jsonPath("$.lastname").value(lastname));
     }
 
     @Test
     public void saveTest() throws Exception {
-        this.mvc.perform(post("/authors/save")
-                .param("id", "5b85490ebce9cb1908cb809b")
-                .param("firstname", "Alex")
-                .param("lastname", "Pushkin"))
-                .andExpect(status().is(SC_ACCEPTED))
-                .andExpect(content().string(containsString("Alex Pushkin обновлен")));
+        String id = "5b85490ebce9cb1908cb809b";
+        String firstname = "Alex";
+        String lastname = "Pushkin";
+        mvc.perform(post("/authors/save/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"firstname\" : \"" + firstname + "\" , \"lastname\" : \"" + lastname + "\" }"))
+                    .andExpect(status().is(SC_ACCEPTED))
+                    .andExpect(jsonPath("$.firstname").value(firstname))
+                    .andExpect(jsonPath("$.lastname").value(lastname));
     }
 
     @Test
-    public void getErrorHtml() throws Exception {
+    public void handleExceptionTest() throws Exception {
+        String firstname = "Fedor";
+        String lastname = "Dostoevsky";
         this.mvc.perform(post("/authors/insert")
-                .param("firstname", "Fedor")
-                .param("lastname", "Dostoevsky"))
-                .andExpect(status().is(SC_BAD_REQUEST))
-                .andExpect(content().string(containsString("Запись Fedor Dostoevsky существует")));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"firstname\" : \"" + firstname + "\" , \"lastname\" : \"" + lastname + "\" }"))
+                    .andExpect(status().is(SC_BAD_REQUEST))
+                    .andExpect(content().string(containsString("Запись Fedor Dostoevsky существует")));
     }
-
-
-    @Test
-    public void localizationTest() throws Exception {
-        this.mvc.perform(get("/").locale(Locale.US))
-                .andExpect(content().string(containsString("My super online library")));
-    }
-
 }

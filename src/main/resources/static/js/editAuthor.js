@@ -1,20 +1,19 @@
-function editAuthor(_id){
+function editAuthor(id){
     var formData = {
-        id : _id,
-        firstname : $("#inputFirstname" + _id).val(),
-        lastname : $("#inputLastname" + _id).val()
+        firstname : $("#inputFirstname" + id).val(),
+        lastname : $("#inputLastname" + id).val()
     }
     $.ajax({
         type : "post",
         contentType : "application/json",
-        url : "/authors/save",
+        url : "/authors/save/" + id,
         data : JSON.stringify(formData),
         dataType : "json",
         success : function(result) {
-            console.log("success edit author!");
+            addToLog("Автор обновлен!");
         },
         error : function(e) {
-            console.log("ERROR: ", e);
+            addToLog(e.responseText);
         }
     });
 }
