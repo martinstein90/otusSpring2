@@ -13,12 +13,12 @@ import java.util.*;
 import static com.martin.domain.Author.COLLECTION_TITLE;
 
 @CompoundIndexes({
-        @CompoundIndex(unique = true, name = "unicNamesAuthor", def="{'Firstname' : 1, 'Lastname': 1}")
+        @CompoundIndex(unique = true, name = "unicAuthorNames", def="{'Firstname' : 1, 'Lastname': 1}")
 })
 @Document(collection=COLLECTION_TITLE)
 @Data
-@ToString(exclude= {"firstname", "lastname"})
-@EqualsAndHashCode(exclude = {"firstname", "lastname"})
+@ToString()
+@EqualsAndHashCode(exclude = {"id"})
 public class Author implements Storable{
 
     public static final String COLLECTION_TITLE = "authors";

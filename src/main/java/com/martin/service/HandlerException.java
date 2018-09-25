@@ -2,8 +2,8 @@ package com.martin.service;
 
 import org.springframework.dao.DuplicateKeyException;
 
-public class Helper {
-    private Helper() {
+public class HandlerException {
+    private HandlerException() {
     }
 
     static final String ERROR_STRING = "Операция с объектом %s не выполнена";

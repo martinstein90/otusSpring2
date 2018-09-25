@@ -1,19 +1,18 @@
 package com.martin.service;
 
 import com.martin.domain.Author;
-import com.martin.domain.Book;
 import org.bson.types.ObjectId;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public interface AuthorService {
 
-    Author add(String firsname, String lastname) throws Exception;
-    long getCount();
-    List<Author> getAll(int page, int amountByOnePage);
-    Author findById(ObjectId id) throws Exception;
-    List<Author> find(String firstname, String lastname) throws Exception;
-    Author update(ObjectId id, String firstname, String lastname) throws Exception;
-    void delete(ObjectId id) throws Exception;
-    void deleteAll();
+    Mono<Author> add(String firsname, String lastname) throws Exception;
+    Mono<Long> getCount();
+    Flux<Author> getAll(int page, int amountByOnePage);
+    Mono<Author> findById(ObjectId id) throws Exception;
+    Flux<Author> find(String firstname, String lastname) throws Exception;
+    Mono<Author> update(ObjectId id, String firstname, String lastname) throws Exception;
+    Mono<Void> delete(ObjectId id) throws Exception;
+    Mono<Void> deleteAll();
 }

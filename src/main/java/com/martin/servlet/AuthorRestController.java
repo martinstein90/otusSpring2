@@ -5,6 +5,8 @@ import com.martin.service.AuthorService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -23,40 +25,33 @@ public class AuthorRestController {
     }
 
     @GetMapping("/authors")
-    public List<AuthorDto> getAll(HttpServletResponse response) {
+    public Flux<AuthorDto> getAll() {
         System.out.println("getAll");
-        List<AuthorDto> authors = authorService.getAll(0, Integer.MAX_VALUE).stream()
-                .map(AuthorDto::toDataTransferObject)
-                .collect(Collectors.toList());
-        response.setStatus(SC_OK);
-        response.setContentType("application/json");
+        Flux<AuthorDto> authors = authorService.getAll(0, Integer.MAX_VALUE).map(AuthorDto::toDataTransferObject);
         return authors;
     }
 
     @PostMapping("/authors/save/{id}")
-    public AuthorDto save(  @PathVariable("id") String id,
-                            @RequestBody AuthorDto authorDto,
-                            HttpServletResponse response) throws Exception {
+    public Mono<AuthorDto> save(@PathVariable("id") String id, AuthorDto authorDto) throws Exception {
         System.out.println("save");
         Author authorDao = AuthorDto.toDomainObject(authorDto);
-        Author updated = authorService.update(new ObjectId(id), authorDao.getFirstname(), authorDao.getLastname());
-        response.setStatus(SC_ACCEPTED );
-        return AuthorDto.toDataTransferObject(updated);
+        return authorService.update(new ObjectId(id), authorDao.getFirstname(), authorDao.getLastname())
+                .map(AuthorDto::toDataTransferObject);
+
     }
 
     @PostMapping("/authors/insert")
-    public AuthorDto insert(@RequestBody AuthorDto authorDto,
-                            HttpServletResponse  response) throws Exception {
+    //Todo Почему тесты валятся если использовать @RequestBody или HttpServletResponse. Как тогда перелать код 201, 202 ?
+    public Mono<AuthorDto> insert(AuthorDto authorDto) throws Exception {
         System.out.println("insert");
         Author authorDao = AuthorDto.toDomainObject(authorDto);
-        Author inserted = authorService.add(authorDao.getFirstname(), authorDao.getLastname());
-        response.setStatus(SC_CREATED);
-        return AuthorDto.toDataTransferObject(inserted);
+        return authorService.add(authorDao.getFirstname(), authorDao.getLastname())
+                .map(AuthorDto::toDataTransferObject);
     }
 
-    @ExceptionHandler(Exception.class)
-    public String handleException(Exception ex, HttpServletResponse  response) {
-        response.setStatus(SC_BAD_REQUEST);
-        return ex.getMessage();
+    @ExceptionHandler(Exception.class) //Todo тест на обработчик ошибок валится. Симптомы такие же как когда использовались @RequestBody или HttpServletResponse
+    public Mono<ErrorDto> handleException(Exception ex) {
+        System.out.println("handleException " + ex.getMessage());
+        return Mono.just(new ErrorDto(ex.getMessage()));
     }
 }

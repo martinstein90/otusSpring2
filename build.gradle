@@ -31,10 +31,14 @@ dependencies {
     compile 'org.aspectj:aspectjrt:1.8.13'
     compile 'org.aspectj:aspectjweaver:1.8.13'
     compile 'com.google.guava:guava:26.0-jre'
-    compile 'org.springframework.boot:spring-boot-starter-data-mongodb:2.0.4.RELEASE'
+
     testCompile 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.1.1'
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    compile 'org.springframework.boot:spring-boot-starter-webflux:2.0.4.RELEASE'
+
+    compile 'org.springframework.boot:spring-boot-starter-data-mongodb:2.0.4.RELEASE'
+    compile 'org.mongodb:mongodb-driver-reactivestreams'
 
     compileOnly('org.projectlombok:lombok')
 }
