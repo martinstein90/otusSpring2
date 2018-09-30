@@ -1,12 +1,10 @@
 package com.martin.service;
 
-import com.martin.caching.Cachable;
 import com.martin.domain.Author;
 import com.martin.repository.AuthorRepository;
 import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -42,14 +40,12 @@ public class AuthorRxService implements AuthorService {
         return authorRepository.count();
     }
 
-    @Cachable(target = Author.class, operation = ADD, disable = true)
     @Override
     public Flux<Author> getAll(int page, int amountByOnePage) {
         Flux<Author> authors = authorRepository.findAll().skip(page * amountByOnePage).take(amountByOnePage);
         return authors;
     }
 
-    @Cachable(target = Author.class, operation = GET, disable = true)
     @Override
     public Mono<Author> findById(ObjectId id) {
         Mono<Author> byId = authorRepository.findById(id);
