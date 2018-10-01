@@ -27,13 +27,8 @@ public class AuthorRxService implements AuthorService {
     @Override
     public Mono<Author> add(String firstname, String lastname) throws Exception {
         Author author = new Author(firstname, lastname);
-        Mono<Author> save = null;
-        try {
-            save = authorRepository.save(author);
-        }
-        catch(DataAccessException exception) {
-            handlerException(exception, author.toString());
-        }
+        Mono<Author> save = authorRepository.save(author)
+                .doOnError(exception->handlerException(exception, author.toString()));
         return save;
     }
 
@@ -45,7 +40,9 @@ public class AuthorRxService implements AuthorService {
     @Cachable(target = Author.class, operation = ADD, disable = true)
     @Override
     public Flux<Author> getAll(int page, int amountByOnePage) {
-        Flux<Author> authors = authorRepository.findAll().skip(page * amountByOnePage).take(amountByOnePage);
+        Flux<Author> authors = authorRepository.findAll()
+                .skip(page * amountByOnePage)
+                .take(amountByOnePage);
         return authors;
     }
 
@@ -61,13 +58,8 @@ public class AuthorRxService implements AuthorService {
 
     @Override
     public Flux<Author> find(String firstname, String lastname) throws Exception {
-        Flux<Author> authors = null;
-        try {
-            authors = authorRepository.findByFirstnameOrLastname(firstname, lastname);
-        }
-        catch (DataAccessException exception) {
-            handlerException(exception, Author.class.getSimpleName());
-        }
+        Flux<Author> authors = authorRepository.findByFirstnameOrLastname(firstname, lastname)
+                    .doOnError(exception->handlerException(exception, Author.class.getSimpleName()));
         return authors;
     }
 
@@ -84,14 +76,8 @@ public class AuthorRxService implements AuthorService {
     }
 
     public Mono<Void> delete(ObjectId id) throws Exception {
-        Mono<Void> res = null;
-        try {
-            res = authorRepository.deleteById(id);
-        }
-        catch (DataAccessException exception) {
-            handlerException(exception, Author.class.getSimpleName());
-        }
-        return res;
+        return authorRepository.deleteById(id)
+                .doOnError(exception->handlerException(exception, Author.class.getSimpleName()));
     }
 
     @Override

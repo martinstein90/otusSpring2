@@ -12,15 +12,15 @@ public class HandlerException {
     static final String EMPTY_RESULT_BY_ID_ERROR_STRING = "Объект %s c id %d не найден";
     static final String ASSOCIATED_ERROR_STRING = "Объект %s не удалить при ссылающего на него %s объектов";
 
-    static void handlerException(Exception exception, String object) throws Exception {
+    static void handlerException(Throwable exception, String object) {
         System.out.println(exception.getClass().getName());
         System.out.println(exception.getMessage());
         if(exception instanceof DuplicateKeyException)
-            throw new Exception(String.format(DUPLICATE_ERROR_STRING, object));
-//        else if(message.contains("Значение слишком длинное для поля"))  //Todo наверное, такое в монге не реализовать. Размер ничем не ограничен...
+            throw new RuntimeException(String.format(DUPLICATE_ERROR_STRING, object));
+//        else if(message.contains("Значение слишком длинное для поля"))
 //            throw new Exception(String.format(FORMAT_ERROR_STRING, object));
         else
-            throw new Exception(String.format(ERROR_STRING, object));
+            throw new RuntimeException(String.format(ERROR_STRING, object));
 
     }
 }

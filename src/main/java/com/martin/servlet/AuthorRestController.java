@@ -4,6 +4,8 @@ import com.martin.domain.Author;
 import com.martin.service.AuthorService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -32,26 +34,27 @@ public class AuthorRestController {
     }
 
     @PostMapping("/authors/save/{id}")
-    public Mono<AuthorDto> save(@PathVariable("id") String id, AuthorDto authorDto) throws Exception {
+    public Mono<ResponseEntity> save(@PathVariable("id") String id, AuthorDto authorDto) throws Exception {
         System.out.println("save");
         Author authorDao = AuthorDto.toDomainObject(authorDto);
         return authorService.update(new ObjectId(id), authorDao.getFirstname(), authorDao.getLastname())
-                .map(AuthorDto::toDataTransferObject);
-
+                .map(AuthorDto::toDataTransferObject)
+                .map(dto->ResponseEntity.status(HttpStatus.ACCEPTED).body(dto));
     }
 
     @PostMapping("/authors/insert")
-    //Todo Почему тесты валятся если использовать @RequestBody или HttpServletResponse. Как тогда перелать код 201, 202 ?
-    public Mono<AuthorDto> insert(AuthorDto authorDto) throws Exception {
+    public Mono<ResponseEntity> insert(AuthorDto authorDto) throws Exception {
         System.out.println("insert");
         Author authorDao = AuthorDto.toDomainObject(authorDto);
         return authorService.add(authorDao.getFirstname(), authorDao.getLastname())
-                .map(AuthorDto::toDataTransferObject);
+                .map(AuthorDto::toDataTransferObject)
+                .map(dto->ResponseEntity.status(HttpStatus.CREATED).body(dto));
     }
 
-    @ExceptionHandler(Exception.class) //Todo тест на обработчик ошибок валится. Симптомы такие же как когда использовались @RequestBody или HttpServletResponse
-    public Mono<ErrorDto> handleException(Exception ex) {
+    @ExceptionHandler(Throwable.class)
+    public Mono<ResponseEntity> handleException(Throwable ex) {
         System.out.println("handleException " + ex.getMessage());
-        return Mono.just(new ErrorDto(ex.getMessage()));
+        return Mono.just(new ErrorDto(ex.getMessage()))
+                .map(dto->ResponseEntity.status(HttpStatus.BAD_REQUEST).body(dto));
     }
 }

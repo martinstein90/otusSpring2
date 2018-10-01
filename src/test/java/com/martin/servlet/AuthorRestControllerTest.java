@@ -99,7 +99,7 @@ public class AuthorRestControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromFormData(formData))
                 .exchange()
-                    .expectStatus().isOk()
+                    .expectStatus().isCreated()
                     .expectBody(AuthorDto.class).isEqualTo(pushkinDto);
     }
 
@@ -116,7 +116,7 @@ public class AuthorRestControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromFormData(formData))
                 .exchange()
-                    .expectStatus().isOk()
+                    .expectStatus().isAccepted()
                     .expectBody(AuthorDto.class).isEqualTo(pushkinDto);
     }
 

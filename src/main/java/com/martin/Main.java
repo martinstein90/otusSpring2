@@ -27,8 +27,8 @@ public class Main {
     public void init() throws Exception {
         System.out.println("=======================init");
 
-        authorService.deleteAll().subscribe(System.out::println);
-        authorService.add("Martin", "Stein").subscribe();
+//        authorService.deleteAll().subscribe(System.out::println);
+//        authorService.add("Martin", "Stein").subscribe();
         //Todo Почему программа висит на .block(); В то время когда .block() прекрасно работает в сервисах.
 //        authorService.add("Alex", "Pushkin").block();
 //        authorService.add("Fedor", "Dostoevsky").block();
