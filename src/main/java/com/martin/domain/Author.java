@@ -12,14 +12,10 @@ import java.util.*;
 
 import static com.martin.domain.Author.COLLECTION_TITLE;
 
-@CompoundIndexes({
-        @CompoundIndex(unique = true, name = "unicAuthorNames", def="{'Firstname' : 1, 'Lastname': 1}")
-})
-@Document(collection=COLLECTION_TITLE)
 @Data
 @ToString()
 @EqualsAndHashCode(exclude = {"id"})
-public class Author implements Storable{
+public class Author {
 
     public static final String COLLECTION_TITLE = "authors";
     public static final String FIELD_FIRSTNAME = "Firstname";
