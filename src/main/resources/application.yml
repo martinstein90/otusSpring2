@@ -1,7 +1,10 @@
 spring:
-  data:
-    mongodb:
-      authentication-database: none
-      database: library
-      port: 27017
-      host: localhost
+  datasource:
+    url: jdbc:mysql://localhost/superDB?serverTimezone=UTC&useSSL=false
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: create-drop

@@ -1,7 +1,6 @@
 package com.martin.servlet;
 
 import com.martin.domain.Author;
-import org.bson.types.ObjectId;
 
 import java.util.Objects;
 
@@ -44,13 +43,13 @@ public class AuthorDto {
         this.id = id;
     }
 
-    public static Author toDomainObject(AuthorDto dto) {
-        return new Author(dto.getFirstname(), dto.getLastname());
-    }
-
-    public static AuthorDto toDataTransferObject(Author dao) {
-        return new AuthorDto(dao.getId()!=null ? dao.getId().toString() : "0", dao.getFirstname(), dao.getLastname());
-    }
+//    public static Author toDomainObject(AuthorDto dto) {
+//        return new Author(dto.getFirstname(), dto.getLastname());
+//    }
+//
+//    public static AuthorDto toDataTransferObject(Author dao) {
+//        return new AuthorDto(dao.getId()!=null ? dao.getId().toString() : "0", dao.getFirstname(), dao.getLastname());
+//    }
 
     @Override
     public boolean equals(Object o) {

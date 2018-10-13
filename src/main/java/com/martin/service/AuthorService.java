@@ -1,10 +1,12 @@
 package com.martin.service;
 
 import com.martin.domain.Author;
-import org.bson.types.ObjectId;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 public interface AuthorService {
+    Author add(String firsname, String lastname) throws Exception;
+    List<Author> getAll();
+
 
 }
