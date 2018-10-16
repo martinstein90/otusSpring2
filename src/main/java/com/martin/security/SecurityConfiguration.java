@@ -4,12 +4,15 @@ import com.martin.service.UserDetailsServiceImpl;
 import com.martin.service.UserJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -24,49 +27,28 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
+               //.and().antMatcher("/").anonymous()
                 .and()
-                .authorizeRequests().antMatchers("/public").permitAll()
+                .authorizeRequests().antMatchers( "/", "/public", "/success").permitAll()
                 .and()
-                .authorizeRequests().antMatchers("/authenticated", "/success").authenticated()
+                .authorizeRequests().antMatchers("/authenticated").authenticated()
                 .and()
-                .formLogin().loginPage("/login").successForwardUrl("/success");
+                .formLogin().loginPage("/login")
+        ;
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new PasswordEncoder() {
-            @Override
-            public String encode(CharSequence rawPassword) {
-                return UserJpaService.encode(rawPassword.toString());
-            }
-
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPasswordFromStorage) {
-                System.out.println("matches rawPassword = " + rawPassword +
-                        " encodedPasswordFromStorage = " + encodedPasswordFromStorage);
-                return encode(rawPassword).equals(encodedPasswordFromStorage);
-            }
-        };
-    }
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
+    @Autowired
+    private AuthenticationManagerImpl authenticationManager;
+
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService);
+        auth.authenticationProvider(authenticationManager);
     }
 
-
-//    @Override
-//    protected UserDetailsService userDetailsService() {
-//        return new UserDetailsServiceImpl();
-//    }
-//
-//    @Bean(name = "userDetailsService")
-//    @Override
-//    public UserDetailsService userDetailsServiceBean() throws Exception {
-//        return super.userDetailsServiceBean();
-//    }
 }

@@ -18,6 +18,7 @@ public class User implements UserDetails {
     public static final String FIELD_USERNAME = "Username";
     public static final String FIELD_PASSWORD = "Password";
     public static final String FIELD_PHONE_NUMBER = "PhoneNumber";
+    public static final String FIELD_SMS = "Sms";
     public static final String FIELD_AUTHORITIES = "Authorities";
     public static final String FIELD_ACCOUNT_NON_EXPIRED = "AccountNonExpired";
     public static final String FIELD_ACCOUNT_NON_LOCKED = "AccountNonLocked";
@@ -41,7 +42,11 @@ public class User implements UserDetails {
 
     @Getter @Setter
     @Column(name = FIELD_PHONE_NUMBER)
-    private String phoneNumber; //Todo String - ok? Почему не работает unique, записываются пользователи с одинакомыми телефонами
+    private String phoneNumber;
+
+    @Getter @Setter
+    @Column(name = FIELD_SMS)
+    private String sms;
 
     @Getter @Setter
     @ElementCollection(fetch = FetchType.EAGER)

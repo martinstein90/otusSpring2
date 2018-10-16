@@ -10,4 +10,5 @@ import java.util.Collection;
 public interface UserService {
     User getUser(String login) throws UsernameNotFoundException;
     User addUser(String username, String password, String phoneNumber, GrantedAuthorityImpl... authorities) throws Exception;
+    void setUserSms(String username, String sms) throws Exception;
 }

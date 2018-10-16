@@ -28,12 +28,20 @@ public class UserJpaService implements UserService {
         if(users.isEmpty()) {
             System.out.println("Username not found");
             throw new UsernameNotFoundException("Username not found");
-            //todo когда вводим логин  несуществующего пользователя, заходим сюда, но никаких эксепшинов, а идем в passwordEncoder
         }
-        if(users.size() != 1) {
-            throw new RuntimeException("Error users data base. users.size() != 1");
-        }
+
         return users.get(0);
+    }
+
+    public void setUserSms(String username, String sms) throws Exception {
+        User user = getUser(username);
+        user.setSms(sms);
+        try {
+            userRepository.save(user);
+        }
+        catch (Exception e) {
+            throw new Exception("Error save user!");
+        }
     }
 
     @Override
