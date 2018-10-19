@@ -15,6 +15,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -28,14 +31,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
-               //.and().antMatcher("/").anonymous()
                 .and()
                 .authorizeRequests().antMatchers( "/", "/public", "/success").permitAll()
                 .and()
                 .authorizeRequests().antMatchers("/authenticated").authenticated()
                 .and()
-                .formLogin().loginPage("/login")
+                .formLogin().loginPage("/login").successForwardUrl("/success").failureUrl("/error")
+                .and()
+                .addFilterBefore(new AfterSecurityContextPersistenceFilter(), UsernamePasswordAuthenticationFilter.class)
         ;
+
     }
 
 

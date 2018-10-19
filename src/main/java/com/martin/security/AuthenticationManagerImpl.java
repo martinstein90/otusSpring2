@@ -39,17 +39,17 @@ public class AuthenticationManagerImpl implements AuthenticationProvider {
         Authentication newAuthentication = null;
 
         if(authentication instanceof UsernamePasswordAuthenticationToken &&
-        authentication.isAuthenticated()== false) {
+            !authentication.isAuthenticated()) {
             System.out.println("Первичная авторизация");
-            //Сюда мы зашли, когда пользователь отправил свой логин и пароль
+
             User user = userService.getUser((String) authentication.getPrincipal());
 
             if(passwordEncoder.matches((CharSequence) authentication.getCredentials(), user.getPassword())) {
-                String sms = "12345";
-                newAuthentication = new UsernamePasswordWithSMSAuthenticationToken(authentication.getName(), authentication.getCredentials(),
-                        user.getAuthorities(), sms);
-                newAuthentication.setAuthenticated(false);
+                System.out.println("Первичная авторизация OK");
+                newAuthentication = new UsernamePasswordAuthenticationToken(
+                        authentication.getName(), authentication.getCredentials(), user.getAuthorities());
 
+                String sms = "123";
                 smsService.sendSms(user.getPhoneNumber(), sms);
 
                 try {
@@ -61,18 +61,21 @@ public class AuthenticationManagerImpl implements AuthenticationProvider {
             }
             else newAuthentication = new AnonymousAuthenticationToken("key", "password", Collections.emptyList());
         }
-        if(authentication instanceof UsernamePasswordWithSMSAuthenticationToken &&
-                authentication.isAuthenticated()== false) {
+        if(authentication instanceof SmsAuthenticationToken &&
+                !authentication.isAuthenticated()) {
             System.out.println("Вторичная авторизация");
-            //Сюда мы зашли, когда пользователь уже аутентифицирован по паролю, нужно как то прикрутить проверку смс
+
             User user = userService.getUser((String) authentication.getPrincipal());
 
-            if ( ((UsernamePasswordWithSMSAuthenticationToken) authentication).getSms().equals(user.getSms()))
-                newAuthentication =  new UsernamePasswordWithSMSAuthenticationToken(authentication.getName(), authentication.getCredentials(),
-                        user.getAuthorities());
-            newAuthentication.setAuthenticated(true);
-        }
+            if (authentication.getCredentials().equals(user.getSms())) {
+                System.out.println("Вторичная авторизация OK");
+                newAuthentication = new UsernamePasswordAuthenticationToken(
+                        authentication.getName(), authentication.getCredentials(), user.getAuthorities());
 
+            } else
+                return authentication;
+            //Todo если смс не правильно, возвращаем старую аутентификацию
+        }
         System.out.println("New: " + newAuthentication);
         return newAuthentication;
     }
