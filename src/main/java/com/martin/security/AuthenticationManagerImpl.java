@@ -42,7 +42,7 @@ public class AuthenticationManagerImpl implements AuthenticationProvider {
             !authentication.isAuthenticated()) {
             System.out.println("Первичная авторизация");
 
-            User user = userService.getUser((String) authentication.getPrincipal());
+            User user = userSpolkervice.getUser((String) authentication.getPrincipal());
 
             if(passwordEncoder.matches((CharSequence) authentication.getCredentials(), user.getPassword())) {
                 System.out.println("Первичная авторизация OK");
