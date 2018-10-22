@@ -1,6 +1,7 @@
 package com.martin;
 
 import com.martin.security.GrantedAuthorityImpl;
+import com.martin.service.AuthorService;
 import com.martin.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -18,6 +19,8 @@ public class Main {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private AuthorService authorService;
 
 
     public static void main(String[] args) {
@@ -34,6 +37,5 @@ public class Main {
 
         userService.addUser("Eric", "user", "123-12-13",
                 new GrantedAuthorityImpl(USER));
-
     }
 }
