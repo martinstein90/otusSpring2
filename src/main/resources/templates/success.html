@@ -1,9 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8"/>
 </head>
 <body>
-Вы успешно вошли !
+<p th:text="'Еще чуть-чуть, ' + ${user} + '!'"> - </p>
+<p> Подтвердите смс. (Заглушка для смс: "123")</p>
+
+<form method= "post" action="/login">
+    <input type="hidden" name= "username" th:value="${username}"/>
+
+    <label for="inputSms">Sms: </label>
+    <input type="text" id="inputSms" name= "sms"/>
+
+    <br>
+    <input type="submit" value="Подтвердить"/>
+</form>
 </body>
 </html>

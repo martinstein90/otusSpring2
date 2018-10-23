@@ -1,17 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8"/>
-</head>
-<body>
-<p1 th:text="${isAuthenticated}">isAuthenticated</p1>
-
-<a th:href="@{public}">/public</a>
-<br>
-<a th:href="@{authenticated}">/authenticated</a>
-<br>
-<form method= "post" action="/logout">
-    <input type="submit" value="Выйти"/>
-</form>
-</body>
+    <head>
+        <meta charset="UTF-8"/>
+    </head>
+    <body>
+        <a href="/public">/public</a>
+        <br>
+        <a href="/authenticated">/authenticated</a>
+    </body>
 </html>

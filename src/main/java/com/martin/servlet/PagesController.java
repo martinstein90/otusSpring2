@@ -1,6 +1,6 @@
 package com.martin.servlet;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.martin.domain.User;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,13 +13,8 @@ public class PagesController {
     // UsernamePasswordAuthenticationToken
 
     @GetMapping("/")
-    public String indexPage(Model model) {
+    public String indexPage() {
         System.out.println("indexPage");
-
-        print();
-//
-//        model.addAttribute("isAuthenticated", SecurityContextHolder
-//                .getContext().getAuthentication().isAuthenticated());
         return "index";
     }
 
@@ -27,8 +22,6 @@ public class PagesController {
     public String publicPage() {
         System.out.println("publicPage");
         print();
-
-
         return "public";
     }
 
@@ -39,18 +32,25 @@ public class PagesController {
         return "authenticated";
     }
 
-    @GetMapping("/login")
+    @GetMapping("/login1")
     public String loginPage() {
         System.out.println("loginPage");
         print();
-        return "login";
+        return "login1";
     }
 
     @PostMapping("/success")
-    public String successPage() {
-        System.out.println("successPage");
+    public String successPage(String username, Model model) {
+        model.addAttribute("user", username);
+        model.addAttribute("username", username);
         print();
         return "success";
+    }
+
+    @PostMapping("/finish")
+    public String finishPage() {
+        print();
+        return "finish";
     }
 
     @GetMapping("/error")

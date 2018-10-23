@@ -19,7 +19,6 @@ public class Main {
     private UserService userService;
 
 
-
     public static void main(String[] args) {
         SpringApplication.run(Main.class);
     }
