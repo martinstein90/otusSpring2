@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class PagesController {
 
-
-    // UsernamePasswordAuthenticationToken
-
     @GetMapping("/")
     public String indexPage() {
         System.out.println("indexPage");
@@ -47,17 +44,12 @@ public class PagesController {
         return "success";
     }
 
-    @PostMapping("/finish")
-    public String finishPage() {
-        print();
-        return "finish";
-    }
-
     @GetMapping("/error")
     public String errorPage() {
         System.out.println("errorPage");
         return "error";
     }
+
 //
 //    @ExceptionHandler(Exception.class)
 //    public ModelAndView handleException(Exception ex) {
