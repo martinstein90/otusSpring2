@@ -5,6 +5,7 @@ import com.martin.domain.User;
 import com.martin.repository.UserRepository;
 import com.martin.security.GrantedAuthorityImpl;
 import com.martin.security.Role;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +16,7 @@ import java.util.*;
 @Service
 public class UserJpaService implements UserService {
 
+    @Autowired
     private final UserRepository userRepository;
 
     public UserJpaService(UserRepository userRepository) {

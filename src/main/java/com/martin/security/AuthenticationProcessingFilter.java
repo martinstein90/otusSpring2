@@ -1,20 +1,15 @@
 package com.martin.security;
 
-import com.martin.domain.User;
 import com.martin.security.tokens.PrimaryAuthenticationToken;
 import com.martin.security.tokens.SecondaryAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
-import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
@@ -24,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,7 +27,7 @@ import java.util.Set;
 public class AuthenticationProcessingFilter extends AbstractAuthenticationProcessingFilter {
 
 
-    public AuthenticationProcessingFilter(AuthenticationManagerImpl authenticationManager) {
+    public AuthenticationProcessingFilter(@Autowired  AuthenticationManagerImpl authenticationManager) {
         super(new AntPathRequestMatcher("/login", "POST"));
         setAuthenticationManager(authenticationManager);
         setAuthenticationSuccessHandler(new AuthenticationSuccessHandlerImpl());
