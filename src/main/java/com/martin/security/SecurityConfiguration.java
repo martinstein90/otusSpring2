@@ -1,30 +1,21 @@
 package com.martin.security;
 
-import com.martin.service.UserDetailsServiceImpl;
-import com.martin.service.UserJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/");
+        web.ignoring().antMatchers("/h2-console/**");
     }
 
     @Override
@@ -32,28 +23,38 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
                 .and()
-                .authorizeRequests().antMatchers( "/", "/public", "/success").permitAll()
+                .authorizeRequests().antMatchers("/*").authenticated()
                 .and()
-                .authorizeRequests().antMatchers("/authenticated").authenticated()
-                .and()
-                .formLogin().loginPage("/login").successForwardUrl("/success").failureUrl("/error")
-                .and()
-                .addFilterBefore(new AfterSecurityContextPersistenceFilter(), UsernamePasswordAuthenticationFilter.class)
-        ;
-
+                .formLogin()
+                .and().logout().logoutSuccessUrl("/").logoutUrl("/logout");
     }
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new PasswordEncoder() {
+            @Override
+            public String encode(CharSequence charSequence) {
+                return charSequence.toString();
+            }
+
+            @Override
+            public boolean matches(CharSequence charSequence, String s) {
+                return charSequence.toString().equals(s);
+            }
+        };
+    }
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
-    private AuthenticationManagerImpl authenticationManager;
-
-    @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService);
-        auth.authenticationProvider(authenticationManager);
+        auth.inMemoryAuthentication()
+                .withUser("admin").password("password").roles("ADMIN")
+                .and()
+                .withUser("user1").password("password").roles("USER")
+                .and()
+                .withUser("user2").password("password").roles("USER")
+                .and()
+                .withUser("user3").password("password").roles("USER")
+                .and()
+                .withUser("user4").password("password").roles("USER");
     }
-
 }

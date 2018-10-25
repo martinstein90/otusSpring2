@@ -1,4 +1,4 @@
-package com.martin.security;
+package com.martin.service;
 
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;

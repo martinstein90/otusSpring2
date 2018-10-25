@@ -1,14 +1,13 @@
 package com.martin.service;
 
-import com.martin.domain.Author;
-import com.martin.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.domain.BasePermission;
-import org.springframework.security.acls.domain.ObjectIdentityImpl;
-import org.springframework.security.acls.domain.ObjectIdentityRetrievalStrategyImpl;
-import org.springframework.security.acls.domain.PrincipalSid;
+import org.springframework.security.acls.domain.*;
 import org.springframework.security.acls.model.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class SecurityServiceImpl implements SecurityService {
@@ -16,56 +15,48 @@ public class SecurityServiceImpl implements SecurityService {
     @Autowired
     private MutableAclService aclService;
 
-    private long u;
-
     @Override
-    public void addSecurity(String owner, long authorId, Class<?> type) {
-        System.out.println("----------------------addSecurity " + owner + authorId + type);
+    public void addSecurity(Authentication authentication, long id, Class<?> type) {
 
-        Sid sidOwner = new PrincipalSid(owner);
-        //TODO Доступ к автору по умолчанию имеют ROLE_ADMIN, owner, Permission.ADMINISTRATION
+        System.out.println("Security add " + authentication + " " + id + " " + type);
 
+        Sid sidOwner = new PrincipalSid(authentication);
         ObjectIdentityGenerator generator = new ObjectIdentityRetrievalStrategyImpl();
-        ObjectIdentity identity = generator.createObjectIdentity(authorId, Author.class.getName());
+        ObjectIdentity identity = generator.createObjectIdentity(id, type.getName());
 
-        MutableAcl acl = aclService.createAcl(identity);
+        AuditableAcl acl = (AuditableAcl)aclService.createAcl(identity);
         acl.setOwner(sidOwner);
+        acl.setParent(null);
+        acl.setEntriesInheriting(false);
 
-        acl.insertAce(acl.getEntries().size(), BasePermission.READ, new PrincipalSid("Pety"), true);
+
+        acl.insertAce(acl.getEntries().size(), BasePermission.ADMINISTRATION, sidOwner, true);
+        acl.updateAuditing(acl.getEntries().size()-1, true, true);
+        acl.insertAce(acl.getEntries().size(), BasePermission.ADMINISTRATION, new GrantedAuthoritySid("ROLE_ADMIN"), true);
+        acl.updateAuditing(acl.getEntries().size()-1, true, true);
 
         aclService.updateAcl(acl);
-
-        u=authorId;
-
     }
 
-    public void addPermission(long authorId, Class<?> type) {
-        System.out.println("------------------------addPermission");
-        ObjectIdentity identity = new ObjectIdentityImpl(Author.class.getName(), u);
+    @Override
+    public void addPermission(long id, Class<?> type, Permission permission, String principal) {
 
+        ObjectIdentity identity = new ObjectIdentityImpl(type.getName(), id);
         MutableAcl acl = (MutableAcl) aclService.readAclById(identity);
-        System.out.println("acl = " + acl);
-        acl.getOwner();
-        acl.insertAce(acl.getEntries().size(), BasePermission.READ, new PrincipalSid("Katya"), true);
+        acl.insertAce(acl.getEntries().size(), permission, new PrincipalSid(principal), true);
     }
 
+    @Override
+    public boolean isGranted(long id, Class<?> type, Permission permission, String principal) {
+        ObjectIdentity oid = new ObjectIdentityImpl(type.getName(), id);
+        Acl acl = aclService.readAclById(oid);
+        List<Permission> permissions = Arrays.asList(permission);
+        List<Sid> sids = Arrays.asList((Sid) new PrincipalSid(principal));
 
+        if (!acl.isGranted(permissions, sids, true)) {
+            throw new RuntimeException("Access denied.");
+        }
+        return true;
+    }
 
-    /*
-    *
-acl.insertAce(acl.getEntries().size(),
-BasePermission.ADMINISTRATION, admin, true);
-    * */
-
-
-    /*
-final ObjectIdentity oid = new ObjectIdentityImpl(BankAccount.class, 10);
-Acl acl = aclService.readAclById(oid);
-final List<Permission> permissions = Arrays.asList(BasePermission.READ);
-final List<Sid> sids = Arrays.asList((Sid) new GrantedAuthoritySid("ROLE_ADMIN"));
-
-if (!acl.isGranted(permissions, sids, false)) {
-throw new RuntimeException("Access denied.");
-}
- */
 }

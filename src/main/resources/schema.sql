@@ -1,9 +1,3 @@
---drop table if exists authors;
---create table authors(	id int not null auto_increment,
---						          firstname varchar(32) not null,
---lastname varchar(32) not null,
---primary key(id));
-
 DROP TABLE IF EXISTS  acl_entry;
 DROP TABLE IF EXISTS  acl_object_identity;
 DROP TABLE IF EXISTS  acl_sid;
