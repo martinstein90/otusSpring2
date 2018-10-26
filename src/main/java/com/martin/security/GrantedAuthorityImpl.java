@@ -9,12 +9,11 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
 @Embeddable
-@Data @AllArgsConstructor @NoArgsConstructor @EqualsAndHashCode @ToString
+@Data @AllArgsConstructor @NoArgsConstructor
 public class GrantedAuthorityImpl implements GrantedAuthority {
 
     public static final String FILED_ROLE = "role";
 
-    @Getter @Setter
     @Enumerated(EnumType.STRING)
     @Column(name = FILED_ROLE)
     private Role role;

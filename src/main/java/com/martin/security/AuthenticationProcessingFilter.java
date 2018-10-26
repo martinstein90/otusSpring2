@@ -2,6 +2,7 @@ package com.martin.security;
 
 import com.martin.security.tokens.PrimaryAuthenticationToken;
 import com.martin.security.tokens.SecondaryAuthenticationToken;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,8 +25,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
+@Slf4j
 public class AuthenticationProcessingFilter extends AbstractAuthenticationProcessingFilter {
-
 
     public AuthenticationProcessingFilter(@Autowired  AuthenticationManagerImpl authenticationManager) {
         super(new AntPathRequestMatcher("/login", "POST"));
@@ -38,7 +39,7 @@ public class AuthenticationProcessingFilter extends AbstractAuthenticationProces
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException, IOException, ServletException {
 
-        System.out.println("attemptAuthentication");
+        log.info("attemptAuthentication");
 
         Authentication authentication = null;
 
@@ -46,16 +47,12 @@ public class AuthenticationProcessingFilter extends AbstractAuthenticationProces
 
         if(parameters.contains("username") && parameters.contains("password")) {
             String username = request.getParameter("username");
-            System.out.println("username = " + username);
             String password = request.getParameter("password");
-            System.out.println("password = " + password);
             authentication = new UsernamePasswordAuthenticationToken(username, password);
         }
         else if(parameters.contains("username") && parameters.contains("sms")) {
             String username = request.getParameter("username");
-            System.out.println("username = " + username);
             String sms = request.getParameter("sms");
-            System.out.println("sms = " + sms);
             authentication = new SecondaryAuthenticationToken(username, sms);
         }
         return getAuthenticationManager().authenticate(authentication);
@@ -66,19 +63,17 @@ public class AuthenticationProcessingFilter extends AbstractAuthenticationProces
 
         @Override
         public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-            System.out.println("onAuthenticationSuccess");
 
             if(authentication instanceof PrimaryAuthenticationToken) {
-                System.out.println("AuthenticationSuccessHandlerImpl PrimaryAuthenticationToken");
+                log.info("PrimaryAuthenticationToken");
                 request.setAttribute("username", authentication.getPrincipal().toString());
                 request.getRequestDispatcher("/success").forward(request, response);
             }
             if(authentication instanceof SecondaryAuthenticationToken) {
-                System.out.println("AuthenticationSuccessHandlerImpl SecondaryAuthenticationToken");
+                log.info("SecondaryAuthenticationToken");
 
                 HttpSession session = request.getSession();
                 SavedRequest savedRequest = (SavedRequest) session.getAttribute("SPRING_SECURITY_SAVED_REQUEST");
-                System.out.println(savedRequest.getRedirectUrl());
                 new DefaultRedirectStrategy().sendRedirect(request, response, savedRequest.getRedirectUrl());
             }
         }
@@ -88,7 +83,6 @@ public class AuthenticationProcessingFilter extends AbstractAuthenticationProces
 
         @Override
         public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-            System.out.println("onAuthenticationFailure");
             request.getRequestDispatcher("/error").forward(request, response);
         }
     }

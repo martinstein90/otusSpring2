@@ -1,7 +1,6 @@
 package com.martin.security;
 
 import com.martin.service.UserDetailsServiceImpl;
-import com.martin.service.UserJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,10 +34,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .formLogin().loginPage("/login1");
     }
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-    @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService);
-    }
+//    @Autowired
+//    private UserDetailsServiceImpl userDetailsService;
+//
+//    @Override
+//    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.userDetailsService(userDetailsService);
+//    }
 }

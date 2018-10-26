@@ -1,43 +1,46 @@
 package com.martin.servlet;
 
 import com.martin.domain.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@Slf4j
 public class PagesController {
 
     @GetMapping("/")
     public String indexPage() {
-        System.out.println("indexPage");
+        log.info("indexPage");
         return "index";
     }
 
     @GetMapping("/public")
     public String publicPage() {
-        System.out.println("publicPage");
+        log.info("publicPage");
         print();
         return "public";
     }
 
     @GetMapping("/authenticated")
     public String authenticatedPage() {
-        System.out.println("authenticatedPage");
+        log.info("authenticatedPage");
         print();
         return "authenticated";
     }
 
     @GetMapping("/login1")
     public String loginPage() {
-        System.out.println("loginPage");
+        log.info("loginPage");
         print();
         return "login1";
     }
 
     @PostMapping("/success")
     public String successPage(String username, Model model) {
+        log.info("successPage");
         model.addAttribute("user", username);
         model.addAttribute("username", username);
         print();
@@ -62,7 +65,6 @@ public class PagesController {
 //    }
 
     private void print() {
-        System.out.println(SecurityContextHolder
-                .getContext().getAuthentication());
+        log.info(SecurityContextHolder.getContext().getAuthentication().toString());
     }
 }

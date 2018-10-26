@@ -18,6 +18,7 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
+
 }
 
 repositories {
@@ -37,6 +38,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-security'
     compile 'org.springframework.security:spring-security-test'
 
-    compileOnly 'org.projectlombok:lombok:1.18.0'
+    //compileOnly 'org.projectlombok:lombok:1.18.0'
+    optional  'org.projectlombok:lombok:1.18.0'
     compile 'com.google.guava:guava:26.0-jre'
 }
