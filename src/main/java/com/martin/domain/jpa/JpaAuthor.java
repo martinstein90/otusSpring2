@@ -1,14 +1,16 @@
-package com.martin.domain;
+package com.martin.domain.jpa;
 
 import lombok.*;
 
 import javax.persistence.*;
 
-import static com.martin.domain.Author.COLLECTION_TITLE;
+import java.util.List;
+
+import static com.martin.domain.jpa.JpaAuthor.COLLECTION_TITLE;
 
 @Data @NoArgsConstructor @EqualsAndHashCode(exclude = {"id"})
 @Entity @Table(name = COLLECTION_TITLE)
-public class Author {
+public class JpaAuthor {
 
     public static final String COLLECTION_TITLE = "authors";
     public static final String FIELD_FIRSTNAME = "Firstname";
@@ -24,7 +26,10 @@ public class Author {
     @Column(name = FIELD_LASTNAME)
     private String lastname;
 
-    public Author(String firstname, String lastname) {
+    @OneToMany(mappedBy="author", fetch=FetchType.LAZY)
+    private List<JpaBook> books;
+
+    public JpaAuthor(String firstname, String lastname) {
         this.firstname = firstname;
         this.lastname = lastname;
     }
