@@ -18,7 +18,10 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
+}
 
+plugins {
+    id 'io.franzbecker.gradle-lombok' version '1.14'
 }
 
 repositories {
@@ -36,9 +39,8 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
     compile 'org.springframework.boot:spring-boot-starter-security'
-    compile 'org.springframework.security:spring-security-test'
+    testCompile 'org.springframework.security:spring-security-test'
 
-    //compileOnly 'org.projectlombok:lombok:1.18.0'
-    optional  'org.projectlombok:lombok:1.18.0'
+    compileOnly 'org.projectlombok:lombok:1.18.0'
     compile 'com.google.guava:guava:26.0-jre'
 }

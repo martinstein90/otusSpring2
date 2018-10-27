@@ -1,6 +1,5 @@
 package com.martin.servlet;
 
-import com.martin.domain.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -20,21 +19,21 @@ public class PagesController {
     @GetMapping("/public")
     public String publicPage() {
         log.info("publicPage");
-        print();
+        printAuthentication();
         return "public";
     }
 
     @GetMapping("/authenticated")
     public String authenticatedPage() {
         log.info("authenticatedPage");
-        print();
+        printAuthentication();
         return "authenticated";
     }
 
     @GetMapping("/login1")
     public String loginPage() {
         log.info("loginPage");
-        print();
+        printAuthentication();
         return "login1";
     }
 
@@ -43,13 +42,14 @@ public class PagesController {
         log.info("successPage");
         model.addAttribute("user", username);
         model.addAttribute("username", username);
-        print();
+        printAuthentication();
         return "success";
     }
 
     @GetMapping("/error")
     public String errorPage() {
         System.out.println("errorPage");
+        printAuthentication();
         return "error";
     }
 
@@ -64,7 +64,7 @@ public class PagesController {
 //        return modelAndView;
 //    }
 
-    private void print() {
+    private void printAuthentication() {
         log.info(SecurityContextHolder.getContext().getAuthentication().toString());
     }
 }

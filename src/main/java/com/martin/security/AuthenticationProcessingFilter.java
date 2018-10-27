@@ -65,15 +65,15 @@ public class AuthenticationProcessingFilter extends AbstractAuthenticationProces
         public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
             if(authentication instanceof PrimaryAuthenticationToken) {
-                log.info("PrimaryAuthenticationToken");
+                log.info("AuthenticationSuccess PrimaryAuthenticationToken");
                 request.setAttribute("username", authentication.getPrincipal().toString());
                 request.getRequestDispatcher("/success").forward(request, response);
             }
             if(authentication instanceof SecondaryAuthenticationToken) {
-                log.info("SecondaryAuthenticationToken");
-
+                log.info("AuthenticationSuccess SecondaryAuthenticationToken");
                 HttpSession session = request.getSession();
                 SavedRequest savedRequest = (SavedRequest) session.getAttribute("SPRING_SECURITY_SAVED_REQUEST");
+                log.info("Redirect " + savedRequest.getRedirectUrl());
                 new DefaultRedirectStrategy().sendRedirect(request, response, savedRequest.getRedirectUrl());
             }
         }
