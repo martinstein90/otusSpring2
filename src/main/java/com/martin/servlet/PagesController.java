@@ -26,8 +26,8 @@ public class PagesController {
     @PostMapping("/author")
     public String addAuthorPost(String firstname, String lastname, Model model) {
         authorService.add(firstname, lastname);
-        model.addAttribute("message",
-                "Автор " + firstname + " " + lastname + " добавлен!");
+        model.addAttribute( "message",
+                            "Автор " + firstname + " " + lastname + " добавлен!");
         return "success";
     }
 

@@ -43,9 +43,6 @@ dependencies {
     compile 'org.springframework.security:spring-security-config'
 
 
-    //
-  
-
     compileOnly 'org.projectlombok:lombok:1.18.0'
     compile 'com.google.guava:guava:26.0-jre'
 }

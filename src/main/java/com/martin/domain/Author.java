@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 import static com.martin.domain.Author.COLLECTION_TITLE;
 
-@Data @NoArgsConstructor @ToString @EqualsAndHashCode(exclude = {"id"})
+@Data @NoArgsConstructor @EqualsAndHashCode(exclude = {"id"})
 @Entity @Table(name = COLLECTION_TITLE)
 public class Author {
 
@@ -16,14 +16,11 @@ public class Author {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter @Setter
     private long id;
 
-    @Getter @Setter
     @Column(name = FIELD_FIRSTNAME)
     private String firstname;
 
-    @Getter @Setter
     @Column(name = FIELD_LASTNAME)
     private String lastname;
 

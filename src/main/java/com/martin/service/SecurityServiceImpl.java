@@ -18,8 +18,6 @@ public class SecurityServiceImpl implements SecurityService {
     @Override
     public void addSecurity(Authentication authentication, long id, Class<?> type) {
 
-        System.out.println("Security add " + authentication + " " + id + " " + type);
-
         Sid sidOwner = new PrincipalSid(authentication);
         ObjectIdentityGenerator generator = new ObjectIdentityRetrievalStrategyImpl();
         ObjectIdentity identity = generator.createObjectIdentity(id, type.getName());
@@ -28,7 +26,6 @@ public class SecurityServiceImpl implements SecurityService {
         acl.setOwner(sidOwner);
         acl.setParent(null);
         acl.setEntriesInheriting(false);
-
 
         acl.insertAce(acl.getEntries().size(), BasePermission.ADMINISTRATION, sidOwner, true);
         acl.updateAuditing(acl.getEntries().size()-1, true, true);
