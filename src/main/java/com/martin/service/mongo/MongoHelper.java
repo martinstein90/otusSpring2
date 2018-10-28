@@ -1,9 +1,9 @@
 package com.martin.service.mongo;
 
-import com.mongodb.DuplicateKeyException;
+import org.springframework.dao.DuplicateKeyException;
 
-public class Helper {
-    private Helper() {
+public class MongoHelper {
+    private MongoHelper() {
     }
 
     static final String ERROR_STRING = "Операция с объектом %s не выполнена";

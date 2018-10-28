@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.martin.service.mongo.Helper.EMPTY_RESULT_BY_ID_ERROR_STRING;
+import static com.martin.service.mongo.Helper.handlerException;
+
 
 @Service
 public class MongoAuthorServiceImpl implements MongoAuthorService {
@@ -49,7 +52,7 @@ public class MongoAuthorServiceImpl implements MongoAuthorService {
     @Override
     public MongoAuthor findById(ObjectId id) {
         return authorRepository.findById(id).orElseThrow(()->
-                new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Author.class.getSimpleName(), id)));
+                new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, MongoAuthor.class.getSimpleName(), id)));
     }
 
     @Override
@@ -59,7 +62,7 @@ public class MongoAuthorServiceImpl implements MongoAuthorService {
             authors = Lists.newArrayList(authorRepository.findByFirstnameOrLastname(frstname, lastname));
         }
         catch (DataIntegrityViolationException exception) {
-            handlerException(exception, Author.class.getSimpleName());
+            handlerException(exception, MongoAuthor.class.getSimpleName());
         }
         return authors;
     }
@@ -67,7 +70,7 @@ public class MongoAuthorServiceImpl implements MongoAuthorService {
     @Override
     public MongoAuthor update(ObjectId id, String firstname, String lastname) throws Exception {
         MongoAuthor author = authorRepository.findById(id).orElseThrow(()->
-                new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, Author.class.getSimpleName(), id)));
+                new IllegalArgumentException(String.format(EMPTY_RESULT_BY_ID_ERROR_STRING, MongoAuthor.class.getSimpleName(), id)));
         if(firstname!= null)
             author.setFirstname(firstname);
         if(lastname!=null)
@@ -76,7 +79,7 @@ public class MongoAuthorServiceImpl implements MongoAuthorService {
             authorRepository.save(author);
         }
         catch (DataIntegrityViolationException exception) {
-            handlerException(exception, Author.class.getSimpleName());
+            handlerException(exception, MongoAuthor.class.getSimpleName());
         }
         return author;
     }
@@ -86,7 +89,7 @@ public class MongoAuthorServiceImpl implements MongoAuthorService {
             authorRepository.deleteById(id);
         }
         catch (DataIntegrityViolationException exception) {
-            handlerException(exception, Author.class.getSimpleName());
+            handlerException(exception, MongoAuthor.class.getSimpleName());
         }
     }
 
