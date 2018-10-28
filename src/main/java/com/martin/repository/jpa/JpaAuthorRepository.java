@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 @Repository
 public interface JpaAuthorRepository extends PagingAndSortingRepository<JpaAuthor, Long> {
 
-    @Query("select b from Book b left join b.author a where a.id = ?1")
+    @Query("select b from JpaBook b left join b.author a where a.id = ?1")
     Iterable<JpaBook> getBooks(long id);
 
     Iterable<JpaAuthor> findByFirstnameOrLastname(String firstname, String lastname);

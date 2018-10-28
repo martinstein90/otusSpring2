@@ -13,8 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import static com.martin.domain.mongo.MongoAuthor.COLLECTION_TITLE;
 
 @CompoundIndexes({
-        @CompoundIndex(unique = true, name = "unicNamesAuthor", def="{'Firstname' : 1, 'Lastname': 1}")
-})
+        @CompoundIndex(unique = true, name = "unicNamesAuthor", def="{'Firstname' : 1, 'Lastname': 1}")})
 @Document(collection=COLLECTION_TITLE)
 @Data @NoArgsConstructor @EqualsAndHashCode(exclude = "id")
 public class MongoAuthor {

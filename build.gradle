@@ -34,7 +34,9 @@ dependencies {
 
     compile 'org.springframework.boot:spring-boot-starter-data-mongodb:2.0.4.RELEASE'
 
-
+    compile 'org.springframework.boot:spring-boot-starter-batch'
+    
+    
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
 

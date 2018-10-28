@@ -26,8 +26,8 @@ public class JpaAuthor {
     @Column(name = FIELD_LASTNAME)
     private String lastname;
 
-    @OneToMany(mappedBy="author", fetch=FetchType.LAZY)
-    private List<JpaBook> books;
+//    @OneToMany(mappedBy="author", fetch=FetchType.LAZY)
+//    private List<JpaBook> books;
 
     public JpaAuthor(String firstname, String lastname) {
         this.firstname = firstname;
