@@ -24,9 +24,9 @@ public class Main {
     }
 
 
-//    @PostConstruct
-//    public void init() throws Exception {
-//        for(int i=0; i<150; i++)
-//            jpaAuthorRepository.save(new JpaAuthor("Alex" + i, "Pushkin" + i));
-//    }
+    @PostConstruct
+    public void init() throws Exception {
+        for(int i=0; i<150; i++)
+            jpaAuthorRepository.save(new JpaAuthor("Alex" + i, "Pushkin" + i));
+    }
 }

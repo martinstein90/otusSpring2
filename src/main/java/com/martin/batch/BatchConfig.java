@@ -5,32 +5,27 @@ import com.martin.domain.jpa.JpaAuthor;
 import com.martin.domain.mongo.MongoAuthor;
 import com.martin.repository.jpa.JpaAuthorRepository;
 import com.martin.repository.mongo.MongoAuthorRepository;
-import javafx.beans.binding.StringBinding;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.*;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
 import org.springframework.batch.item.data.builder.RepositoryItemWriterBuilder;
-import org.springframework.batch.item.file.FlatFileItemWriter;
-import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
-import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Sort;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 @EnableBatchProcessing
 @Configuration
@@ -44,10 +39,11 @@ public class BatchConfig {
     public StepBuilderFactory stepBuilderFactory;
 
     @Bean
-    public Job jpaToMongoJob(Step jpaToMongoStep) {
+    public Job jpaToMongoJob(Step jpaToMongoStep, Step jpaRemoveStep) {
         return jobBuilderFactory.get("jpaToMongoJob")
                 .incrementer(new RunIdIncrementer())
                 .flow(jpaToMongoStep)
+                .next(jpaRemoveStep)
                 .end()
                 .listener(new JobExecutionListener() {
                     @Override
@@ -71,26 +67,6 @@ public class BatchConfig {
                 .reader(jpaAuthorItemReader)
                 .processor(jpaToMongoAuthorItemProcessor)
                 .writer(mongoAuthorItemWriter)
-                .listener(new ItemReadListener() {
-                    public void beforeRead() { log.info("Начало чтения"); }
-                    public void afterRead(Object object) { log.info("Конец чтения " + object); }
-                    public void onReadError(Exception exception) { log.info("Ошибка чтения " + exception); }
-                })
-                .listener(new ItemWriteListener() {
-                    public void beforeWrite(List list) { log.info("Начало записи " + list); }
-                    public void afterWrite(List list) { log.info("Конец записи " + list); }
-                    public void onWriteError(Exception exception, List list) { log.info("Ошибка записи " + list + " " + exception); }
-                })
-                .listener(new ItemProcessListener() {
-                    public void beforeProcess(Object object) {log.info("Начало обработки " + object);}
-                    public void afterProcess(Object object1, Object object2) {log.info("Конец обработки " + object1 + " " + object2);}
-                    public void onProcessError(Object object, Exception exception) {log.info("Ошибка обработки " + object + " " + exception);}
-                })
-                .listener(new ChunkListener() {
-                    public void beforeChunk(ChunkContext chunkContext) {log.info("Начало пачки " + chunkContext);}
-                    public void afterChunk(ChunkContext chunkContext) {log.info("Конец пачки " + chunkContext);}
-                    public void afterChunkError(ChunkContext chunkContext) {log.info("Ошибка пачки " + chunkContext);}
-                })
                 .build();
     }
 
@@ -126,4 +102,27 @@ public class BatchConfig {
                 .build();
     }
 
+
+    @Bean
+    public Step jpaRemoveStep( RepositoryItemReader<JpaAuthor> jpaAuthorItemReader,
+                                ItemProcessor jpaAuthorRemoveProcessor ) {
+        return stepBuilderFactory.get("jpaRemoveStep")
+                .chunk(5)
+                .reader(jpaAuthorItemReader)
+                .processor(jpaAuthorRemoveProcessor)
+                .build();
+    }
+
+
+    @Bean
+    public ItemProcessor jpaAuthorRemoveProcessor(JpaAuthorRepository jpaAuthorRepository) {
+        return new ItemProcessor<JpaAuthor, Object>() {
+            @Override
+            public Object process(JpaAuthor item) throws Exception {
+                jpaAuthorRepository.delete(item);
+                return null;
+            }
+
+        };
+    }
 }
