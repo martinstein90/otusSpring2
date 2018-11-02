@@ -20,6 +20,3 @@ spring:
     show-sql: false
     hibernate:
       ddl-auto: create-drop
-
-  batch:
-    initialize-schema: ALWAYS
