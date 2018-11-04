@@ -41,7 +41,7 @@ dependencies {
     compile 'net.sf.ehcache:ehcache:2.6.11'
     compile 'org.springframework:spring-context-support'
     compile 'org.springframework.security:spring-security-config'
-
+    testCompile 'org.springframework.security:spring-security-test'
 
     compileOnly 'org.projectlombok:lombok:1.18.0'
     compile 'com.google.guava:guava:26.0-jre'
