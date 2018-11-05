@@ -1,96 +1,53 @@
 package com.martin;
 
-import com.martin.domain.Check;
-import com.martin.domain.Food;
-import com.martin.domain.OrderItem;
-import com.martin.service.OrderItemsService;
+import com.martin.domain.Department;
+import com.martin.domain.Employee;
+import com.martin.repository.DepartmentRepository;
+import com.martin.repository.EmployeeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.annotation.IntegrationComponentScan;
-import org.springframework.integration.channel.DirectChannel;
-import org.springframework.integration.channel.PublishSubscribeChannel;
-import org.springframework.integration.config.EnableIntegration;
-import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.channel.MessageChannels;
-import org.springframework.messaging.support.GenericMessage;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import java.util.Random;
+import javax.annotation.PostConstruct;
 
-@IntegrationComponentScan
-@SuppressWarnings({"resource", "Duplicates", "InfiniteLoopStatement"})
-@ComponentScan
-@Configuration
-@EnableIntegration
+@SpringBootApplication
+@EnableWebMvc
 public class App {
 
-    private static final String[] MENU = {"something satisfying", "something strong"};
-
-    private static OrderItem generateOrderItem() {
-        return new OrderItem( MENU[new Random().nextInt(MENU.length)], false);
-    }
-
     public static void main(String[] args) {
-
-        ConfigurableApplicationContext ctx = SpringApplication.run(App.class, args);
-
-        DirectChannel itemsChannel = ctx.getBean("itemsChannel", DirectChannel.class);
-
-        PublishSubscribeChannel foodChannel = ctx.getBean("foodChannel", PublishSubscribeChannel.class);
-        foodChannel.subscribe(handler-> System.out.println("Ready orderItem: " + ((Food)handler.getPayload()).getFoodName()));
-
-        DirectChannel checkChannel = ctx.getBean("checkChannel", DirectChannel.class);
-        checkChannel.subscribe(handler-> System.out.println("Check: " + ((Check)handler.getPayload()).getCash()));
-
-
-        OrderItem orderItem = generateOrderItem();
-        System.out.println("New orderItem: " + orderItem.getItemName());
-
-        itemsChannel.send(new GenericMessage<>(orderItem));
-
-
-        ctx.close();
+        SpringApplication.run(App.class);
     }
 
-    @Bean
-    public IntegrationFlow cafeFlow(OrderItemsService orderItemsService) {
-        return IntegrationFlows
-                .from("itemsChannel")
+    @Autowired
+    private DepartmentRepository departmentRepository;
 
-                .<OrderItem, OrderItem>transform(orderItemsService::specify)
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
-                .<OrderItem, Boolean>route(
-                        OrderItem::isIced,
-                        mapping -> mapping
-                                .subFlowMapping(true, sf -> sf
-                                        .handle("kitchenService", "cookHot")
-                                )
-                                .subFlowMapping(false, sf -> sf
-                                        .handle("kitchenService", "cookCold")
-                                )
-                )
-                .channel("foodChannel")
-                .handle("cashboxService", "getPleaseByFood")
-                .channel("checkChannel")
-                .get();
+    @Component
+    public class MyHealthIndicator implements HealthIndicator {
+
+        @Override
+        public Health health() {
+            if(employeeRepository.count() > 2)
+                return Health.up().build();
+            return Health.down().build();
+        }
     }
 
+    @PostConstruct
+    public void init() {
+        Department sales = departmentRepository.save(new Department("sales"));
+        Department developed = departmentRepository.save(new Department("developed"));
+        Department economic = departmentRepository.save(new Department("economic"));
 
-    @Bean
-    public DirectChannel itemsChannel(){
-        return MessageChannels.direct().get();
-    }
-
-    @Bean
-    public PublishSubscribeChannel foodChannel(){
-        return MessageChannels.publishSubscribe().get();
-    }
-
-    @Bean
-    public DirectChannel checkChannel(){
-        return MessageChannels.direct().get();
+        employeeRepository.save(new Employee("Kirill", sales));
+        employeeRepository.save(new Employee("Alex", developed));
+        employeeRepository.save(new Employee("Petr", developed));
+        employeeRepository.save(new Employee("Olga", economic));
     }
 }
