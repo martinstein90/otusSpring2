@@ -1,7 +1,5 @@
 package com.martin.service;
 
-import com.martin.domain.Food;
-import com.martin.domain.OrderItem;
 import org.springframework.stereotype.Service;
 
 @Service

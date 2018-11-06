@@ -1,8 +1,5 @@
 package com.martin;
 
-import com.martin.domain.Check;
-import com.martin.domain.Food;
-import com.martin.domain.OrderItem;
 import com.martin.service.OrderItemsService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
