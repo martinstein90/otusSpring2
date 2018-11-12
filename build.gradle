@@ -50,6 +50,10 @@ dependencies {
 
     compile 'org.springframework.boot:spring-boot-starter-integration'
 
+
+
+    compile 'com.netflix.hystrix:hystrix-core'
+
     compileOnly 'org.projectlombok:lombok:1.18.0'
     compile 'com.google.guava:guava:26.0-jre'
 }
