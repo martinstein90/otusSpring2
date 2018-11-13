@@ -28,32 +28,24 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 
-    compile 'mysql:mysql-connector-java:8.0.11'
-    runtime 'com.h2database:h2'
-    compile 'org.springframework.boot:spring-boot-starter-data-jpa:2.0.3.RELEASE'
 
-    compile 'org.springframework.boot:spring-boot-starter-data-mongodb:2.0.4.RELEASE'
 
-    compile 'org.springframework.boot:spring-boot-starter-batch'
-    testCompile 'org.springframework.batch:spring-batch-test'
 
-    compile 'org.springframework.shell:spring-shell-starter:2.0.1.RELEASE'
-    
+
     compile 'org.springframework.boot:spring-boot-starter-web'
-    compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
-    compile 'org.springframework.boot:spring-boot-starter-security'
-    compile 'org.springframework.security:spring-security-acl'
+
+
     compile 'net.sf.ehcache:ehcache:2.6.11'
-    compile 'org.springframework:spring-context-support'
-    compile 'org.springframework.security:spring-security-config'
+
 
     compile 'org.springframework.boot:spring-boot-starter-integration'
 
 
+    compile group: 'com.netflix.hystrix', name: 'hystrix-javanica', version: '1.5.12'
 
-    compile 'com.netflix.hystrix:hystrix-core'
 
+            
     compileOnly 'org.projectlombok:lombok:1.18.0'
     compile 'com.google.guava:guava:26.0-jre'
 }
