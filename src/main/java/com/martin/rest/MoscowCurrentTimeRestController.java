@@ -15,6 +15,6 @@ public class MoscowCurrentTimeRestController {
     @GetMapping("/time")
     public CurrentTimeDto getCurrentTime() {
         System.out.println("getCurrentTime");
-        return moscowCurrentTimeService.getCurrentTime();
+        return moscowCurrentTimeService.getCurrentTimeFromYandex();
     }
 }
