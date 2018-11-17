@@ -1,0 +1,16 @@
+version: "3"
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: postgres_image/Dockerfile
+    ports:
+      - "5432:5432"
+
+  app:
+    image: openjdk:myjar
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+
