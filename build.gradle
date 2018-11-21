@@ -32,13 +32,11 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
 
 
-    compile 'net.sf.ehcache:ehcache:2.6.11'
-
 
     compile 'org.springframework.boot:spring-boot-starter-integration'
 
 
-    compile group: 'com.netflix.hystrix', name: 'hystrix-javanica', version: '1.5.12'
+    compile 'org.springframework.cloud:spring-cloud-starter-netflix-hystrix:2.0.2.RELEASE'
 
 
             
